@@ -10,53 +10,57 @@ using UnityEngine;
 
 namespace Mediapipe.Unity
 {
-  public class PoseLandmarkerResultAnnotationController : AnnotationController<MultiPoseLandmarkListWithMaskAnnotation>
-  {
-    [SerializeField] private bool _visualizeZ = false;
+	public class
+		PoseLandmarkerResultAnnotationController : AnnotationController<MultiPoseLandmarkListWithMaskAnnotation>
+	{
+		[SerializeField] private bool _visualizeZ = false;
 
-    private readonly object _currentTargetLock = new object();
-    private PoseLandmarkerResult _currentTarget;
+		private readonly object _currentTargetLock = new object();
+		private PoseLandmarkerResult _currentTarget;
 
-    public void InitScreen(int maskWidth, int maskHeight) => annotation.InitMask(maskWidth, maskHeight);
+		public void InitScreen(int maskWidth, int maskHeight) => annotation.InitMask(maskWidth, maskHeight);
 
-    public void DrawNow(PoseLandmarkerResult target)
-    {
-      target.CloneTo(ref _currentTarget);
-      if (_currentTarget.segmentationMasks != null)
-      {
-        ReadMask(_currentTarget.segmentationMasks);
-        // NOTE: segmentationMasks can still be accessed from newTarget.
-        _currentTarget.segmentationMasks.Clear();
-      }
-      SyncNow();
-    }
+		public void DrawNow(PoseLandmarkerResult target)
+		{
+			target.CloneTo(ref _currentTarget);
+			if (_currentTarget.segmentationMasks != null)
+			{
+				ReadMask(_currentTarget.segmentationMasks);
+				// NOTE: segmentationMasks can still be accessed from newTarget.
+				_currentTarget.segmentationMasks.Clear();
+			}
 
-    public void DrawLater(PoseLandmarkerResult target) => UpdateCurrentTarget(target);
+			SyncNow();
+		}
 
-    private void ReadMask(IReadOnlyList<Image> segmentationMasks) => annotation.ReadMask(segmentationMasks, isMirrored);
+		public void DrawLater(PoseLandmarkerResult target) => UpdateCurrentTarget(target);
 
-    protected void UpdateCurrentTarget(PoseLandmarkerResult newTarget)
-    {
-      lock (_currentTargetLock)
-      {
-        newTarget.CloneTo(ref _currentTarget);
-        if (_currentTarget.segmentationMasks != null)
-        {
-          ReadMask(_currentTarget.segmentationMasks);
-          // NOTE: segmentationMasks can still be accessed from newTarget.
-          _currentTarget.segmentationMasks.Clear();
-        }
-        isStale = true;
-      }
-    }
+		private void ReadMask(IReadOnlyList<Image> segmentationMasks) =>
+			annotation.ReadMask(segmentationMasks, isMirrored);
 
-    protected override void SyncNow()
-    {
-      lock (_currentTargetLock)
-      {
-        isStale = false;
-        annotation.Draw(_currentTarget.poseLandmarks, _visualizeZ);
-      }
-    }
-  }
+		protected void UpdateCurrentTarget(PoseLandmarkerResult newTarget)
+		{
+			lock (_currentTargetLock)
+			{
+				newTarget.CloneTo(ref _currentTarget);
+				if (_currentTarget.segmentationMasks != null)
+				{
+					ReadMask(_currentTarget.segmentationMasks);
+					// NOTE: segmentationMasks can still be accessed from newTarget.
+					_currentTarget.segmentationMasks.Clear();
+				}
+
+				isStale = true;
+			}
+		}
+
+		protected override void SyncNow()
+		{
+			lock (_currentTargetLock)
+			{
+				isStale = false;
+				annotation.Draw(_currentTarget.poseLandmarks, _visualizeZ);
+			}
+		}
+	}
 }

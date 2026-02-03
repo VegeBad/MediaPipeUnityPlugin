@@ -9,55 +9,59 @@ using UnityEngine;
 
 namespace Mediapipe.Tasks.Core
 {
-  internal class PacketsCallbackTable
-  {
-    private const int _MaxSize = 20;
+	internal class PacketsCallbackTable
+	{
+		private const int _MaxSize = 20;
 
-    private static int _Counter = 0;
-    private static readonly GlobalInstanceTable<int, TaskRunner.PacketsCallback> _Table = new GlobalInstanceTable<int, TaskRunner.PacketsCallback>(_MaxSize);
+		private static int _Counter = 0;
 
-    public static (int, TaskRunner.NativePacketsCallback) Add(TaskRunner.PacketsCallback callback)
-    {
-      if (callback == null)
-      {
-        return (-1, null);
-      }
+		private static readonly GlobalInstanceTable<int, TaskRunner.PacketsCallback> _Table =
+			new GlobalInstanceTable<int, TaskRunner.PacketsCallback>(_MaxSize);
 
-      var callbackId = _Counter++;
-      _Table.Add(callbackId, callback);
-      return (callbackId, InvokeCallbackIfFound);
-    }
+		public static (int, TaskRunner.NativePacketsCallback) Add(TaskRunner.PacketsCallback callback)
+		{
+			if (callback == null)
+			{
+				return (-1, null);
+			}
 
-    public static bool TryGetValue(int id, out TaskRunner.PacketsCallback callback) => _Table.TryGetValue(id, out callback);
+			var callbackId = _Counter++;
+			_Table.Add(callbackId, callback);
+			return (callbackId, InvokeCallbackIfFound);
+		}
 
-    [AOT.MonoPInvokeCallback(typeof(TaskRunner.NativePacketsCallback))]
-    private static void InvokeCallbackIfFound(int callbackId, IntPtr statusPtr, IntPtr packetMapPtr)
-    {
-      UnityEngine.Profiling.Profiler.BeginThreadProfiling("Mediapipe", "PacketsCallbackTable.InvokeCallbackIfFound");
-      UnityEngine.Profiling.Profiler.BeginSample("PacketsCallbackTable.InvokeCallbackIfFound");
+		public static bool TryGetValue(int id, out TaskRunner.PacketsCallback callback) =>
+			_Table.TryGetValue(id, out callback);
 
-      // NOTE: if status is not OK, packetMap will be nullptr
-      if (packetMapPtr == IntPtr.Zero)
-      {
-        var status = new Status(statusPtr, false);
-        Debug.LogError(status.ToString());
-        return;
-      }
+		[AOT.MonoPInvokeCallback(typeof(TaskRunner.NativePacketsCallback))]
+		private static void InvokeCallbackIfFound(int callbackId, IntPtr statusPtr, IntPtr packetMapPtr)
+		{
+			UnityEngine.Profiling.Profiler.BeginThreadProfiling("Mediapipe",
+				"PacketsCallbackTable.InvokeCallbackIfFound");
+			UnityEngine.Profiling.Profiler.BeginSample("PacketsCallbackTable.InvokeCallbackIfFound");
 
-      if (TryGetValue(callbackId, out var callback))
-      {
-        try
-        {
-          callback(new PacketMap(packetMapPtr, false));
-        }
-        catch (Exception e)
-        {
-          Debug.LogException(e);
-        }
-      }
+			// NOTE: if status is not OK, packetMap will be nullptr
+			if (packetMapPtr == IntPtr.Zero)
+			{
+				var status = new Status(statusPtr, false);
+				Debug.LogError(status.ToString());
+				return;
+			}
 
-      UnityEngine.Profiling.Profiler.EndSample();
-      UnityEngine.Profiling.Profiler.EndThreadProfiling();
-    }
-  }
+			if (TryGetValue(callbackId, out var callback))
+			{
+				try
+				{
+					callback(new PacketMap(packetMapPtr, false));
+				}
+				catch (Exception e)
+				{
+					Debug.LogException(e);
+				}
+			}
+
+			UnityEngine.Profiling.Profiler.EndSample();
+			UnityEngine.Profiling.Profiler.EndThreadProfiling();
+		}
+	}
 }

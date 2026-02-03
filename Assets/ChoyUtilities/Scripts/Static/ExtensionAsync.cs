@@ -11,423 +11,478 @@ using System.Threading.Tasks;
 
 namespace EugeneC.Utilities
 {
-    public static partial class UtilityCollection
-    {
-        private const string TaskCancellationMessage = "Task was cancelled";
+	public static partial class UtilityCollection
+	{
+		private const string TaskCancellationMessage = "Task was cancelled";
 
-        #region Fade Screen Async  
+		#region Fade Screen Async
 
-        public enum EFadeType : byte
-        {
-            FadeIn = 0,
-            FadeOut = 1,
-        }
-        
-        public static async Task FadeScreenAsync(this CancellationToken token, Image fadeImage, 
-            bool isFadein, float loadDuration, Action onDone = null)
-        {
-            try
-            {
-                if (fadeImage is null) return;
+		public enum EFadeType : byte
+		{
+			FadeIn = 0,
+			FadeOut = 1,
+		}
 
-                var targetAlpha = isFadein ? 1f : 0f;
-                var currentAlpha = fadeImage.color.a;
-                float time = 0;
+		public static async Task FadeScreenAsync(this CancellationToken token, Image fadeImage,
+			bool isFadein, float loadDuration, Action onDone = null)
+		{
+			try
+			{
+				if (fadeImage is null) return;
 
-                while (time <= loadDuration)
-                {
-                    time += Time.unscaledDeltaTime;
-                    var alpha = Mathf.Lerp(currentAlpha, targetAlpha, time / loadDuration);
-                    fadeImage.color = new Color(fadeImage.color.r, fadeImage.color.g, fadeImage.color.b, alpha);
-                    await Awaitable.EndOfFrameAsync(token);
-                }
-                
-                fadeImage.color = new Color(fadeImage.color.r, fadeImage.color.g, fadeImage.color.b, targetAlpha);
-                onDone?.Invoke();
-            }
-            catch { throw new Exception(TaskCancellationMessage); }       
-        }
-        
-        public static async Task<bool> FadeScreenAsync(this CancellationToken token, Image fadeImage, EFadeType fadeType,
-            float loadDuration, float dt, Action onDone = null)
-        {
-            try
-            {
-                if (fadeImage is null) return false;
+				var targetAlpha = isFadein ? 1f : 0f;
+				var currentAlpha = fadeImage.color.a;
+				float time = 0;
 
-                var targetAlpha = fadeType switch
-                {
-                    EFadeType.FadeOut => 0,
-                    EFadeType.FadeIn => 1,
-                    _ => fadeImage.color.a
-                };
+				while (time <= loadDuration)
+				{
+					time += Time.unscaledDeltaTime;
+					var alpha = Mathf.Lerp(currentAlpha, targetAlpha, time / loadDuration);
+					fadeImage.color = new Color(fadeImage.color.r, fadeImage.color.g, fadeImage.color.b, alpha);
+					await Awaitable.EndOfFrameAsync(token);
+				}
 
-                var currentAlpha = fadeImage.color.a;
-                float time = 0;
+				fadeImage.color = new Color(fadeImage.color.r, fadeImage.color.g, fadeImage.color.b, targetAlpha);
+				onDone?.Invoke();
+			}
+			catch
+			{
+				throw new Exception(TaskCancellationMessage);
+			}
+		}
 
-                while (time <= loadDuration)
-                {
-                    time += dt;
-                    var alpha = math.lerp(currentAlpha, targetAlpha, time / loadDuration);
-                    fadeImage.color = new Color(fadeImage.color.r, fadeImage.color.g, fadeImage.color.b, alpha);
-                    await Awaitable.EndOfFrameAsync(token);
-                }
-                
-                fadeImage.color = new Color(fadeImage.color.r, fadeImage.color.g, fadeImage.color.b, targetAlpha);
-                onDone?.Invoke();
-                return true;
-            }
-            catch { throw new Exception(TaskCancellationMessage); }       
-        }
-        
-        public static async Task<bool> FadeScreenAsync(this CancellationToken token, CanvasGroup cg, EFadeType fadeType,
-            float loadDuration, float dt, Action onDone = null)
-        {
-            try
-            {
-                if (cg is null) return false;
-                
-                var targetAlpha = fadeType switch
-                {
-                    EFadeType.FadeOut => 0,
-                    EFadeType.FadeIn => 1,
-                    _ => cg.alpha
-                };
-                var currentAlpha = cg.alpha;
-                var time = 0f;
-                
-                while (time <= loadDuration)
-                {
-                    time += dt;
-                    var alpha = math.lerp(currentAlpha, targetAlpha, time / loadDuration);
-                    cg.alpha = alpha;
-                    await Awaitable.EndOfFrameAsync(token);
-                }
-                
-                cg.alpha = targetAlpha;
-                onDone?.Invoke();
-                return true;
-            }
-            catch { throw new Exception(TaskCancellationMessage); }       
-        }
-        
-#endregion        
-       
-#region Change Color Async
+		public static async Task<bool> FadeScreenAsync(this CancellationToken token, Image fadeImage,
+			EFadeType fadeType,
+			float loadDuration, float dt, Action onDone = null)
+		{
+			try
+			{
+				if (fadeImage is null) return false;
 
-        public static async Task<bool> ChangeColorAsync(this CancellationToken token, Image start, Color target, 
-            float loadDuration, Action onDone = null)
-        {
-            try
-            {
-                if (start is null) return false;
+				var targetAlpha = fadeType switch
+				{
+					EFadeType.FadeOut => 0,
+					EFadeType.FadeIn => 1,
+					_ => fadeImage.color.a
+				};
 
-                var current = start.color;
-                float time = 0;
+				var currentAlpha = fadeImage.color.a;
+				float time = 0;
 
-                while (time <= loadDuration)
-                {
-                    time += Time.unscaledDeltaTime;
-                    Color col = Color.Lerp(current, target, time / loadDuration);
-                    start.color = col;
-                    await Awaitable.EndOfFrameAsync(token);
-                }
+				while (time <= loadDuration)
+				{
+					time += dt;
+					var alpha = math.lerp(currentAlpha, targetAlpha, time / loadDuration);
+					fadeImage.color = new Color(fadeImage.color.r, fadeImage.color.g, fadeImage.color.b, alpha);
+					await Awaitable.EndOfFrameAsync(token);
+				}
 
-                if (token.IsCancellationRequested) return false;
-                start.color = target;
-                onDone?.Invoke();
-                return true;
-            }
-            catch { throw new Exception(TaskCancellationMessage); }       
-        }
-        
-        public static async Task<Color> ChangeColorAsync(this CancellationToken token, float4 start, float4 target, 
-            float loadDuration, Action onDone = null)
-        {
-            try
-            {
-                float time = 0;
-                while (time <= loadDuration)
-                {
-                    time += Time.unscaledDeltaTime;
-                    start = math.lerp(start, target, time / loadDuration);
-                    await Awaitable.EndOfFrameAsync(token);
-                }
+				fadeImage.color = new Color(fadeImage.color.r, fadeImage.color.g, fadeImage.color.b, targetAlpha);
+				onDone?.Invoke();
+				return true;
+			}
+			catch
+			{
+				throw new Exception(TaskCancellationMessage);
+			}
+		}
 
-                onDone?.Invoke();
-                return new Color(start.x, start.y, start.z, start.w);
-            }
-            catch { throw new Exception(TaskCancellationMessage); }       
-        }
-        
-        public static async Task<Color> ChangeColorAsync(this CancellationToken token, Color start, Color target, 
-            float loadDuration, Action onDone = null)
-        {
-            try
-            {
-                float time = 0;
-                var startColor = new float4(start.r, start.g, start.b, start.a);
-                var targetColor = new float4(target.r, target.g, target.b, target.a);
-                var newColor = new float4();
+		public static async Task<bool> FadeScreenAsync(this CancellationToken token, CanvasGroup cg, EFadeType fadeType,
+			float loadDuration, float dt, Action onDone = null)
+		{
+			try
+			{
+				if (cg is null) return false;
 
-                while (time <= loadDuration)
-                {
-                    time += Time.unscaledDeltaTime;
-                    newColor = math.lerp(startColor, targetColor, time / loadDuration);
-                    await Awaitable.EndOfFrameAsync(token);
-                }
+				var targetAlpha = fadeType switch
+				{
+					EFadeType.FadeOut => 0,
+					EFadeType.FadeIn => 1,
+					_ => cg.alpha
+				};
+				var currentAlpha = cg.alpha;
+				var time = 0f;
 
-                onDone?.Invoke();
-                return new Color(newColor.x, newColor.y, newColor.z, newColor.w);
-            }
-            catch { throw new Exception(TaskCancellationMessage); }             
-        }
-        
-        public static async Task<Color> ChangeColorAsync(this CancellationToken token, Color start, Color target, float loadDuration, 
-            float dt, Action onDone = null)
-        {
-            try
-            {
-                float time = 0;
-                var startColor = new float4(start.r, start.g, start.b, start.a);
-                var targetColor = new float4(target.r, target.g, target.b, target.a);
-                var newColor = new float4();
+				while (time <= loadDuration)
+				{
+					time += dt;
+					var alpha = math.lerp(currentAlpha, targetAlpha, time / loadDuration);
+					cg.alpha = alpha;
+					await Awaitable.EndOfFrameAsync(token);
+				}
 
-                while (time <= loadDuration)
-                {
-                    time += dt;
-                    newColor = math.lerp(startColor, targetColor, time / loadDuration);
-                    await Awaitable.EndOfFrameAsync(token);
-                }
+				cg.alpha = targetAlpha;
+				onDone?.Invoke();
+				return true;
+			}
+			catch
+			{
+				throw new Exception(TaskCancellationMessage);
+			}
+		}
 
-                onDone?.Invoke();
-                return new Color(newColor.x, newColor.y, newColor.z, newColor.w);
-            }
-            catch { throw new Exception(TaskCancellationMessage); }       
-        }
-#endregion
-        
-#region Move Transform Async
+		#endregion
 
-        public static async Task<bool> MoveAsync(this CancellationToken token, GameObject obj, Transform targetPos, 
-            float moveDuration, Action onDone = null)
-        {
-            try
-            {
-                if (obj is null || targetPos is null) return false;
+		#region Change Color Async
 
-                var time = 0f;
-                var startPos = obj.transform.position;
-                var endPos = targetPos.position;
+		public static async Task<bool> ChangeColorAsync(this CancellationToken token, Image start, Color target,
+			float loadDuration, Action onDone = null)
+		{
+			try
+			{
+				if (start is null) return false;
 
-                while (time <= moveDuration)
-                {
-                    time += Time.deltaTime;
-                    Vector3 pos = math.lerp(startPos, endPos, time / moveDuration);
-                    obj.transform.position = pos;
-                    await Awaitable.EndOfFrameAsync(token);
-                }
+				var current = start.color;
+				float time = 0;
 
-                if (token.IsCancellationRequested) return false;
-                obj.transform.position = endPos;
-                onDone?.Invoke();
-                return true;
-            }
-            catch { throw new Exception(TaskCancellationMessage); }       
-        }
+				while (time <= loadDuration)
+				{
+					time += Time.unscaledDeltaTime;
+					Color col = Color.Lerp(current, target, time / loadDuration);
+					start.color = col;
+					await Awaitable.EndOfFrameAsync(token);
+				}
 
-        public static async Task<bool> MoveAsync(this CancellationToken token, RectTransform obj, float3 target, 
-            float duration, Action onDone = null)
-        {
-            try
-            {
-                if (obj is null) return false;
-                var time = 0f;
-                var start = (float3)obj.anchoredPosition3D;
+				if (token.IsCancellationRequested) return false;
+				start.color = target;
+				onDone?.Invoke();
+				return true;
+			}
+			catch
+			{
+				throw new Exception(TaskCancellationMessage);
+			}
+		}
 
-                while (time <= duration)
-                {
-                    time += Time.unscaledDeltaTime;
-                    obj.anchoredPosition3D = math.lerp(start, target, time / duration);
-                    await Awaitable.NextFrameAsync(token);
-                }
+		public static async Task<Color> ChangeColorAsync(this CancellationToken token, float4 start, float4 target,
+			float loadDuration, Action onDone = null)
+		{
+			try
+			{
+				float time = 0;
+				while (time <= loadDuration)
+				{
+					time += Time.unscaledDeltaTime;
+					start = math.lerp(start, target, time / loadDuration);
+					await Awaitable.EndOfFrameAsync(token);
+				}
 
-                if (token.IsCancellationRequested) return false;
-                onDone?.Invoke();
-                return true;
-            }
-            catch { throw new Exception(TaskCancellationMessage); }       
-        }
+				onDone?.Invoke();
+				return new Color(start.x, start.y, start.z, start.w);
+			}
+			catch
+			{
+				throw new Exception(TaskCancellationMessage);
+			}
+		}
 
-        public static async Task<bool> MoveAsync(this CancellationToken token, GameObject obj, float3 targetPos, 
-            float moveDuration, Action onDone = null)
-        {
-            try
-            {
-                if (obj is null) return false;
+		public static async Task<Color> ChangeColorAsync(this CancellationToken token, Color start, Color target,
+			float loadDuration, Action onDone = null)
+		{
+			try
+			{
+				float time = 0;
+				var startColor = new float4(start.r, start.g, start.b, start.a);
+				var targetColor = new float4(target.r, target.g, target.b, target.a);
+				var newColor = new float4();
 
-                float time = 0;
-                var startPos = (float3)obj.transform.position;
+				while (time <= loadDuration)
+				{
+					time += Time.unscaledDeltaTime;
+					newColor = math.lerp(startColor, targetColor, time / loadDuration);
+					await Awaitable.EndOfFrameAsync(token);
+				}
 
-                while (time <= moveDuration)
-                {
-                    time += Time.unscaledDeltaTime;
-                    var pos = math.lerp(startPos, targetPos, time / moveDuration);
-                    obj.transform.position = pos;
-                    await Awaitable.EndOfFrameAsync(token);
-                }
+				onDone?.Invoke();
+				return new Color(newColor.x, newColor.y, newColor.z, newColor.w);
+			}
+			catch
+			{
+				throw new Exception(TaskCancellationMessage);
+			}
+		}
 
-                if (token.IsCancellationRequested) return false;
-                obj.transform.position = targetPos;
-                onDone?.Invoke();
-                return true;
-            }
-            catch { throw new Exception(TaskCancellationMessage); }       
-        }
-#endregion        
+		public static async Task<Color> ChangeColorAsync(this CancellationToken token, Color start, Color target,
+			float loadDuration,
+			float dt, Action onDone = null)
+		{
+			try
+			{
+				float time = 0;
+				var startColor = new float4(start.r, start.g, start.b, start.a);
+				var targetColor = new float4(target.r, target.g, target.b, target.a);
+				var newColor = new float4();
 
-        public static async Task RotateObjectAsync(this CancellationToken token, GameObject obj, Vector3 rotateTo, 
-            float rotateDuration, Action onDone = null)
-        {
-            try
-            {
-                if (obj is null) return;
+				while (time <= loadDuration)
+				{
+					time += dt;
+					newColor = math.lerp(startColor, targetColor, time / loadDuration);
+					await Awaitable.EndOfFrameAsync(token);
+				}
 
-                float time = 0f;
-                Quaternion startRot = obj.transform.rotation;
-                Quaternion endRot = Quaternion.Euler(rotateTo);
+				onDone?.Invoke();
+				return new Color(newColor.x, newColor.y, newColor.z, newColor.w);
+			}
+			catch
+			{
+				throw new Exception(TaskCancellationMessage);
+			}
+		}
 
-                while (time <= rotateDuration)
-                {
-                    time += Time.unscaledDeltaTime;
-                    obj.transform.rotation = Quaternion.Slerp(startRot, endRot, time / rotateDuration);
-                    await Awaitable.EndOfFrameAsync(token);
-                }
+		#endregion
 
-                obj.transform.rotation = endRot;
-                onDone?.Invoke();
-            }
-            catch { throw new Exception(TaskCancellationMessage); }       
-        }
+		#region Move Transform Async
 
-        public static async Task<bool> RotateObjectAsync(this CancellationToken token, Transform obj, float3 rotateTo, 
-            float rotateDuration, Action onDone = null)
-        {
-            try
-            {
-                if (obj is null) return false;
+		public static async Task<bool> MoveAsync(this CancellationToken token, GameObject obj, Transform targetPos,
+			float moveDuration, Action onDone = null)
+		{
+			try
+			{
+				if (obj is null || targetPos is null) return false;
 
-                var time = 0f;
-                quaternion startRot = obj.transform.rotation;
-                quaternion endRot = quaternion.Euler(rotateTo);
+				var time = 0f;
+				var startPos = obj.transform.position;
+				var endPos = targetPos.position;
 
-                while (time <= rotateDuration)
-                {
-                    time += Time.unscaledDeltaTime;
-                    obj.transform.rotation = math.slerp(startRot, endRot, time / rotateDuration);
-                    await Awaitable.EndOfFrameAsync(token);
-                }
+				while (time <= moveDuration)
+				{
+					time += Time.deltaTime;
+					Vector3 pos = math.lerp(startPos, endPos, time / moveDuration);
+					obj.transform.position = pos;
+					await Awaitable.EndOfFrameAsync(token);
+				}
 
-                if (token.IsCancellationRequested) return false;
-                obj.transform.rotation = endRot;
-                onDone?.Invoke();
-                return true;
-            }
-            catch { throw new Exception(TaskCancellationMessage); }       
-        }
+				if (token.IsCancellationRequested) return false;
+				obj.transform.position = endPos;
+				onDone?.Invoke();
+				return true;
+			}
+			catch
+			{
+				throw new Exception(TaskCancellationMessage);
+			}
+		}
 
-        public static async Task ScaleObjectAsync(this CancellationToken token, GameObject obj, Vector3 scaleTo, 
-            float scalingDuration, Action onDone = null)
-        {
-            try
-            {
-                if (obj is null) return;
+		public static async Task<bool> MoveAsync(this CancellationToken token, RectTransform obj, float3 target,
+			float duration, Action onDone = null)
+		{
+			try
+			{
+				if (obj is null) return false;
+				var time = 0f;
+				var start = (float3)obj.anchoredPosition3D;
 
-                float time = 0f;
-                Vector3 startScale = obj.transform.localScale;
+				while (time <= duration)
+				{
+					time += Time.unscaledDeltaTime;
+					obj.anchoredPosition3D = math.lerp(start, target, time / duration);
+					await Awaitable.NextFrameAsync(token);
+				}
 
-                while (time <= scalingDuration)
-                {
-                    time += Time.unscaledDeltaTime;
-                    obj.transform.localScale = Vector3.Lerp(startScale, scaleTo, time / scalingDuration);
-                    await Awaitable.EndOfFrameAsync(token);
-                }
+				if (token.IsCancellationRequested) return false;
+				onDone?.Invoke();
+				return true;
+			}
+			catch
+			{
+				throw new Exception(TaskCancellationMessage);
+			}
+		}
 
-                obj.transform.localScale = scaleTo;
-                onDone?.Invoke();
-            }
-            catch { throw new Exception(TaskCancellationMessage); }       
-        }
+		public static async Task<bool> MoveAsync(this CancellationToken token, GameObject obj, float3 targetPos,
+			float moveDuration, Action onDone = null)
+		{
+			try
+			{
+				if (obj is null) return false;
 
-        public static async Task DialogueAsync(this CancellationToken token, List<string> dialogueList, float dialogueDuration,
-            Action<string> displayTo, float timePerChar, Action onDone = null)
-        {
-            try
-            {
-                if (dialogueList is null || dialogueList.Count == 0) return;
+				float time = 0;
+				var startPos = (float3)obj.transform.position;
 
-                foreach (var line in dialogueList)
-                {
-                    if (line == string.Empty) continue;
+				while (time <= moveDuration)
+				{
+					time += Time.unscaledDeltaTime;
+					var pos = math.lerp(startPos, targetPos, time / moveDuration);
+					obj.transform.position = pos;
+					await Awaitable.EndOfFrameAsync(token);
+				}
 
-                    var timer = 0f;
-                    var currentDisplaying = "";
+				if (token.IsCancellationRequested) return false;
+				obj.transform.position = targetPos;
+				onDone?.Invoke();
+				return true;
+			}
+			catch
+			{
+				throw new Exception(TaskCancellationMessage);
+			}
+		}
 
-                    while (currentDisplaying != line)
-                    {
-                        timer += Time.unscaledDeltaTime;
-                        int length = Mathf.CeilToInt(timer / timePerChar);
-                        length = Mathf.Clamp(length, 0, line.Length);
-                        currentDisplaying = line.Substring(0, length);
-                        displayTo(currentDisplaying);
+		#endregion
 
-                        await Awaitable.NextFrameAsync(token);
-                    }
+		public static async Task RotateObjectAsync(this CancellationToken token, GameObject obj, Vector3 rotateTo,
+			float rotateDuration, Action onDone = null)
+		{
+			try
+			{
+				if (obj is null) return;
 
-                    await Awaitable.WaitForSecondsAsync(dialogueDuration, token);
-                }
+				float time = 0f;
+				Quaternion startRot = obj.transform.rotation;
+				Quaternion endRot = Quaternion.Euler(rotateTo);
 
-                displayTo("");
-                onDone?.Invoke();
-            }
-            catch { throw new Exception(TaskCancellationMessage); }       
-        }
+				while (time <= rotateDuration)
+				{
+					time += Time.unscaledDeltaTime;
+					obj.transform.rotation = Quaternion.Slerp(startRot, endRot, time / rotateDuration);
+					await Awaitable.EndOfFrameAsync(token);
+				}
 
-        public static async Task RollRightAngleAsync(this CancellationToken token, Transform ob, float rollSpeed, Vector3 dir, float rollCooldown = 0.1f)
-        {
-            try
-            {
-                Vector3 anchor = ob.position + (Vector3.down + dir) * 0.5f;
-                Vector3 axis = Vector3.Cross(Vector3.up, dir);
+				obj.transform.rotation = endRot;
+				onDone?.Invoke();
+			}
+			catch
+			{
+				throw new Exception(TaskCancellationMessage);
+			}
+		}
 
-                for (int i = 0; i <= (90 / rollSpeed); i++)
-                {
-                    ob.RotateAround(anchor, axis, i);
-                    await Awaitable.WaitForSecondsAsync(rollCooldown, token);
-                }
-            }
-            catch { throw new Exception(TaskCancellationMessage); }       
-        }
+		public static async Task<bool> RotateObjectAsync(this CancellationToken token, Transform obj, float3 rotateTo,
+			float rotateDuration, Action onDone = null)
+		{
+			try
+			{
+				if (obj is null) return false;
 
-        public static async Task TimeScaleAsync(this CancellationToken token, float targetScale, float loadDuration = 2f, Action onDone = null)
-        {
-            try
-            {
-                float currentScale = Time.timeScale;
-                float unscaledTimer = 0;
+				var time = 0f;
+				quaternion startRot = obj.transform.rotation;
+				quaternion endRot = quaternion.Euler(rotateTo);
 
-                while (unscaledTimer <= loadDuration)
-                {
-                    unscaledTimer += Time.unscaledDeltaTime;
-                    float t = math.lerp(currentScale, targetScale, unscaledTimer / loadDuration);
-                    Time.timeScale = t;
-                    await Awaitable.EndOfFrameAsync(token);
-                }
+				while (time <= rotateDuration)
+				{
+					time += Time.unscaledDeltaTime;
+					obj.transform.rotation = math.slerp(startRot, endRot, time / rotateDuration);
+					await Awaitable.EndOfFrameAsync(token);
+				}
 
-                onDone?.Invoke();
-            }
-            catch { throw new Exception(TaskCancellationMessage); }       
-        }
-    }
+				if (token.IsCancellationRequested) return false;
+				obj.transform.rotation = endRot;
+				onDone?.Invoke();
+				return true;
+			}
+			catch
+			{
+				throw new Exception(TaskCancellationMessage);
+			}
+		}
+
+		public static async Task ScaleObjectAsync(this CancellationToken token, GameObject obj, Vector3 scaleTo,
+			float scalingDuration, Action onDone = null)
+		{
+			try
+			{
+				if (obj is null) return;
+
+				float time = 0f;
+				Vector3 startScale = obj.transform.localScale;
+
+				while (time <= scalingDuration)
+				{
+					time += Time.unscaledDeltaTime;
+					obj.transform.localScale = Vector3.Lerp(startScale, scaleTo, time / scalingDuration);
+					await Awaitable.EndOfFrameAsync(token);
+				}
+
+				obj.transform.localScale = scaleTo;
+				onDone?.Invoke();
+			}
+			catch
+			{
+				throw new Exception(TaskCancellationMessage);
+			}
+		}
+
+		public static async Task DialogueAsync(this CancellationToken token, List<string> dialogueList,
+			float dialogueDuration,
+			Action<string> displayTo, float timePerChar, Action onDone = null)
+		{
+			try
+			{
+				if (dialogueList is null || dialogueList.Count == 0) return;
+
+				foreach (var line in dialogueList)
+				{
+					if (line == string.Empty) continue;
+
+					var timer = 0f;
+					var currentDisplaying = "";
+
+					while (currentDisplaying != line)
+					{
+						timer += Time.unscaledDeltaTime;
+						int length = Mathf.CeilToInt(timer / timePerChar);
+						length = Mathf.Clamp(length, 0, line.Length);
+						currentDisplaying = line.Substring(0, length);
+						displayTo(currentDisplaying);
+
+						await Awaitable.NextFrameAsync(token);
+					}
+
+					await Awaitable.WaitForSecondsAsync(dialogueDuration, token);
+				}
+
+				displayTo("");
+				onDone?.Invoke();
+			}
+			catch
+			{
+				throw new Exception(TaskCancellationMessage);
+			}
+		}
+
+		public static async Task RollRightAngleAsync(this CancellationToken token, Transform ob, float rollSpeed,
+			Vector3 dir, float rollCooldown = 0.1f)
+		{
+			try
+			{
+				Vector3 anchor = ob.position + (Vector3.down + dir) * 0.5f;
+				Vector3 axis = Vector3.Cross(Vector3.up, dir);
+
+				for (int i = 0; i <= (90 / rollSpeed); i++)
+				{
+					ob.RotateAround(anchor, axis, i);
+					await Awaitable.WaitForSecondsAsync(rollCooldown, token);
+				}
+			}
+			catch
+			{
+				throw new Exception(TaskCancellationMessage);
+			}
+		}
+
+		public static async Task TimeScaleAsync(this CancellationToken token, float targetScale,
+			float loadDuration = 2f, Action onDone = null)
+		{
+			try
+			{
+				float currentScale = Time.timeScale;
+				float unscaledTimer = 0;
+
+				while (unscaledTimer <= loadDuration)
+				{
+					unscaledTimer += Time.unscaledDeltaTime;
+					float t = math.lerp(currentScale, targetScale, unscaledTimer / loadDuration);
+					Time.timeScale = t;
+					await Awaitable.EndOfFrameAsync(token);
+				}
+
+				onDone?.Invoke();
+			}
+			catch
+			{
+				throw new Exception(TaskCancellationMessage);
+			}
+		}
+	}
 }
 #endif

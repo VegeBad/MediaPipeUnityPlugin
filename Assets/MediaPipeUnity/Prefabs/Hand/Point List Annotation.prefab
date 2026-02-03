@@ -44,7 +44,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ae7563ab8645734c6b682cbbca130f6f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _annotationPrefab: {fileID: 5105739270100195704, guid: cd50999c161e69345953a2cb517dd339,
+  annotationPrefab: {fileID: 5105739270100195704, guid: cd50999c161e69345953a2cb517dd339,
     type: 3}
   _color: {r: 0, g: 1, b: 0, a: 1}
   _radius: 15

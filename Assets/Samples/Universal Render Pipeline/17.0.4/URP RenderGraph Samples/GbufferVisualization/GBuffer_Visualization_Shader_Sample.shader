@@ -41,57 +41,53 @@ Shader "Universal Render Pipeline/GBuffer_Visualization_Shader_Sample"
 
             // -------------------------------------
             // Shader Stages
-            #pragma vertex GBufferVisPassVertex
-            #pragma fragment GBufferVisPassFragment
+#pragma vertex GBufferVisPassVertex
+#pragma fragment GBufferVisPassFragment
 
-            #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Common.hlsl"
-            #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/GlobalSamplers.hlsl"
-            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
-            #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/UnityInstancing.hlsl"
+#include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Common.hlsl"
+#include "Packages/com.unity.render-pipelines.core/ShaderLibrary/GlobalSamplers.hlsl"
+#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+#include "Packages/com.unity.render-pipelines.core/ShaderLibrary/UnityInstancing.hlsl"
 
             // Declare the GBuffer to sample as an input
             TEXTURE2D_X(_GBuffer2);
 
-            struct Attributes
-            {
+            struct Attributes {
                 uint vertexID : SV_VertexID;
                 UNITY_VERTEX_INPUT_INSTANCE_ID
             };
 
-            struct Varyings
-            {
+            struct Varyings {
                 float4 positionCS : SV_POSITION;
-                float2 texcoord   : TEXCOORD0;
+                float2 texcoord : TEXCOORD0;
 
                 UNITY_VERTEX_INPUT_INSTANCE_ID
                 UNITY_VERTEX_OUTPUT_STEREO
             };
 
-            Varyings GBufferVisPassVertex(Attributes input)
-            {
+            Varyings GBufferVisPassVertex(Attributes input) {
                 Varyings output;
                 UNITY_SETUP_INSTANCE_ID(input);
                 UNITY_TRANSFER_INSTANCE_ID(input, output);
                 UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(output);
 
                 float4 pos = GetFullScreenTriangleVertexPosition(input.vertexID);
-                float2 uv  = GetFullScreenTriangleTexCoord(input.vertexID);
+                float2 uv = GetFullScreenTriangleTexCoord(input.vertexID);
 
                 output.positionCS = pos;
-                output.texcoord   = uv;
+                output.texcoord = uv;
 
                 return output;
             }
 
-            void GBufferVisPassFragment(Varyings input, out half4 outColor : SV_Target0)
-            {
+            void GBufferVisPassFragment(Varyings input, out half4 outColor : SV_Target0) {
                 UNITY_SETUP_INSTANCE_ID(input);
                 UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
 
                 float2 uv = input.texcoord;
-                #ifndef UNITY_UV_STARTS_AT_TOP
-                    uv.y = 1.0 - uv.y;
-                #endif
+#ifndef UNITY_UV_STARTS_AT_TOP
+                uv.y = 1.0 - uv.y;
+#endif
                 // Change the sampled GBuffer here
                 outColor = SAMPLE_TEXTURE2D_X_LOD(_GBuffer2, sampler_PointClamp, uv, 0);
             }

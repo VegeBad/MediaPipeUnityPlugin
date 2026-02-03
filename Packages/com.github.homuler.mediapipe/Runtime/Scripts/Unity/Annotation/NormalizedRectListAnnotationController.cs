@@ -8,25 +8,25 @@ using System.Collections.Generic;
 
 namespace Mediapipe.Unity
 {
-  public class NormalizedRectListAnnotationController : AnnotationController<RectangleListAnnotation>
-  {
-    private IReadOnlyList<NormalizedRect> _currentTarget;
+	public class NormalizedRectListAnnotationController : AnnotationController<RectangleListAnnotation>
+	{
+		private IReadOnlyList<NormalizedRect> _currentTarget;
 
-    public void DrawNow(IReadOnlyList<NormalizedRect> target)
-    {
-      _currentTarget = target;
-      SyncNow();
-    }
+		public void DrawNow(IReadOnlyList<NormalizedRect> target)
+		{
+			_currentTarget = target;
+			SyncNow();
+		}
 
-    public void DrawLater(IReadOnlyList<NormalizedRect> target)
-    {
-      UpdateCurrentTarget(target, ref _currentTarget);
-    }
+		public void DrawLater(IReadOnlyList<NormalizedRect> target)
+		{
+			UpdateCurrentTarget(target, ref _currentTarget);
+		}
 
-    protected override void SyncNow()
-    {
-      isStale = false;
-      annotation.Draw(_currentTarget);
-    }
-  }
+		protected override void SyncNow()
+		{
+			isStale = false;
+			annotation.Draw(_currentTarget);
+		}
+	}
 }

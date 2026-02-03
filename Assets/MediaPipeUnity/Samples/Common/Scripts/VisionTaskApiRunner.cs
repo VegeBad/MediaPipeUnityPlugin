@@ -10,53 +10,56 @@ using UnityEngine;
 
 namespace Mediapipe.Unity.Sample
 {
-  public abstract class VisionTaskApiRunner<TTask> : BaseRunner 
-    where TTask : Tasks.Vision.Core.BaseVisionTaskApi
-  {
-    [SerializeField] protected Screen screen;
+	public abstract class VisionTaskApiRunner<T> : BaseRunner
+		where T : Tasks.Vision.Core.BaseVisionTaskApi
+	{
+		[SerializeField] protected Screen screen;
 
-    private Coroutine _coroutine;
-    protected TTask taskApi;
+		private Coroutine _coroutine;
+		protected T taskApi;
 
-    public RunningMode runningMode;
+		public RunningMode runningMode;
 
-    public override void Play()
-    {
-      if (_coroutine != null)
-      {
-        Stop();
-      }
-      base.Play();
-      _coroutine = StartCoroutine(Run());
-    }
+		public override void Play()
+		{
+			if (_coroutine != null)
+			{
+				Stop();
+			}
 
-    public override void Pause()
-    {
-      base.Pause();
-      ImageSourceProvider.ImageSource.Pause();
-    }
+			base.Play();
+			_coroutine = StartCoroutine(Run());
+		}
 
-    public override void Resume()
-    {
-      base.Resume();
-      var _ = StartCoroutine(ImageSourceProvider.ImageSource.Resume());
-    }
+		public override void Pause()
+		{
+			base.Pause();
+			ImageSourceProvider.ImageSource.Pause();
+		}
 
-    public override void Stop()
-    {
-      base.Stop();
-      StopCoroutine(_coroutine);
-      ImageSourceProvider.ImageSource.Stop();
-      taskApi?.Close();
-      taskApi = null;
-    }
+		public override void Resume()
+		{
+			base.Resume();
+			var _ = StartCoroutine(ImageSourceProvider.ImageSource.Resume());
+		}
 
-    protected abstract IEnumerator Run();
+		public override void Stop()
+		{
+			base.Stop();
+			StopCoroutine(_coroutine);
+			ImageSourceProvider.ImageSource.Stop();
+			taskApi?.Close();
+			taskApi = null;
+		}
 
-    protected static void SetupAnnotationController<T>(AnnotationController<T> annotationController, ImageSource imageSource, bool expectedToBeMirrored = false) where T : HierarchicalAnnotation
-    {
-      annotationController.isMirrored = expectedToBeMirrored;
-      annotationController.imageSize = new int2(imageSource.textureWidth, imageSource.textureHeight);
-    }
-  }
+		protected abstract IEnumerator Run();
+
+		protected static void SetupAnnotationController<U>(AnnotationController<U> annotationController,
+			ImageSource imageSource, bool expectedToBeMirrored = false)
+			where U : HierarchicalAnnotation
+		{
+			annotationController.isMirrored = expectedToBeMirrored;
+			annotationController.imageSize = new int2(imageSource.textureWidth, imageSource.textureHeight);
+		}
+	}
 }

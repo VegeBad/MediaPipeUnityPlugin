@@ -8,68 +8,63 @@ using System;
 
 namespace Mediapipe
 {
-  public class GpuResources : MpResourceHandle
-  {
-    private SharedPtrHandle _sharedPtrHandle;
+	public class GpuResources : MpResourceHandle
+	{
+		private SharedPtrHandle _sharedPtrHandle;
 
-    /// <param name="ptr">Shared pointer of mediapipe::GpuResources</param>
-    public GpuResources(IntPtr ptr) : base()
-    {
-      _sharedPtrHandle = new SharedPtr(ptr);
-      this.ptr = _sharedPtrHandle.Get();
-    }
+		/// <param name="ptr">Shared pointer of mediapipe::GpuResources</param>
+		public GpuResources(IntPtr ptr) : base()
+		{
+			_sharedPtrHandle = new SharedPtr(ptr);
+			this.ptr = _sharedPtrHandle.Get();
+		}
 
-    protected override void DisposeManaged()
-    {
-      if (_sharedPtrHandle != null)
-      {
-        _sharedPtrHandle.Dispose();
-        _sharedPtrHandle = null;
-      }
-      base.DisposeManaged();
-    }
+		protected override void DisposeManaged()
+		{
+			if (_sharedPtrHandle != null)
+			{
+				_sharedPtrHandle.Dispose();
+				_sharedPtrHandle = null;
+			}
 
-    protected override void DeleteMpPtr()
-    {
-      // Do nothing
-    }
+			base.DisposeManaged();
+		}
 
-    public IntPtr sharedPtr => _sharedPtrHandle == null ? IntPtr.Zero : _sharedPtrHandle.mpPtr;
+		protected override void DeleteMpPtr()
+		{
+			// Do nothing
+		}
 
-    public static GpuResources Create()
-    {
-      UnsafeNativeMethods.mp_GpuResources_Create(out var statusPtr, out var gpuResourcesPtr).Assert();
-      AssertStatusOk(statusPtr);
+		public IntPtr sharedPtr => _sharedPtrHandle?.mpPtr ?? IntPtr.Zero;
 
-      return new GpuResources(gpuResourcesPtr);
-    }
+		public static GpuResources Create()
+		{
+			UnsafeNativeMethods.mp_GpuResources_Create(out var statusPtr, out var gpuResourcesPtr).Assert();
+			AssertStatusOk(statusPtr);
 
-    public static GpuResources Create(IntPtr externalContext)
-    {
-      UnsafeNativeMethods.mp_GpuResources_Create__Pv(externalContext, out var statusPtr, out var gpuResourcesPtr).Assert();
-      AssertStatusOk(statusPtr);
+			return new GpuResources(gpuResourcesPtr);
+		}
 
-      return new GpuResources(gpuResourcesPtr);
-    }
+		public static GpuResources Create(IntPtr externalContext)
+		{
+			UnsafeNativeMethods.mp_GpuResources_Create__Pv(externalContext, out var statusPtr, out var gpuResourcesPtr)
+				.Assert();
+			AssertStatusOk(statusPtr);
 
-    private class SharedPtr : SharedPtrHandle
-    {
-      public SharedPtr(IntPtr ptr) : base(ptr) { }
+			return new GpuResources(gpuResourcesPtr);
+		}
 
-      protected override void DeleteMpPtr()
-      {
-        UnsafeNativeMethods.mp_SharedGpuResources__delete(ptr);
-      }
+		private class SharedPtr : SharedPtrHandle
+		{
+			public SharedPtr(IntPtr ptr) : base(ptr)
+			{
+			}
 
-      public override IntPtr Get()
-      {
-        return SafeNativeMethods.mp_SharedGpuResources__get(mpPtr);
-      }
+			protected override void DeleteMpPtr() => UnsafeNativeMethods.mp_SharedGpuResources__delete(ptr);
 
-      public override void Reset()
-      {
-        UnsafeNativeMethods.mp_SharedGpuResources__reset(mpPtr);
-      }
-    }
-  }
+			public override IntPtr Get() => SafeNativeMethods.mp_SharedGpuResources__get(mpPtr);
+
+			public override void Reset() => UnsafeNativeMethods.mp_SharedGpuResources__reset(mpPtr);
+		}
+	}
 }

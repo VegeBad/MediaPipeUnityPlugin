@@ -11,31 +11,31 @@ using UnityEngine.UI;
 
 namespace Mediapipe.Unity.Sample.UI
 {
-  public class ModalContents : MonoBehaviour
-  {
-    protected Modal GetModal()
-    {
-      return gameObject.transform.parent.gameObject.GetComponent<Modal>();
-    }
+	public class ModalContents : MonoBehaviour
+	{
+		protected Modal GetModal()
+		{
+			return gameObject.transform.parent.gameObject.GetComponent<Modal>();
+		}
 
-    public virtual void Exit()
-    {
-      GetModal().Close();
-    }
+		public virtual void Exit()
+		{
+			GetModal().Close();
+		}
 
-    protected void InitializeDropdown<T>(Dropdown dropdown, string defaultValue) where T : Enum
-    {
-      dropdown.ClearOptions();
+		protected void InitializeDropdown<T>(Dropdown dropdown, string defaultValue) where T : Enum
+		{
+			dropdown.ClearOptions();
 
-      var options = Enum.GetValues(typeof(T)).Cast<T>().Select(x => x.GetDescription()).ToList();
-      dropdown.AddOptions(options);
+			var options = Enum.GetValues(typeof(T)).Cast<T>().Select(x => x.GetDescription()).ToList();
+			dropdown.AddOptions(options);
 
-      var defaultValueIndex = options.FindIndex(option => option == defaultValue);
+			var defaultValueIndex = options.FindIndex(option => option == defaultValue);
 
-      if (defaultValueIndex >= 0)
-      {
-        dropdown.value = defaultValueIndex;
-      }
-    }
-  }
+			if (defaultValueIndex >= 0)
+			{
+				dropdown.value = defaultValueIndex;
+			}
+		}
+	}
 }

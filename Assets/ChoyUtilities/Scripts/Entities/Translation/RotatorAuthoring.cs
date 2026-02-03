@@ -7,52 +7,54 @@ using ERotationOrder = Unity.Mathematics.math.RotationOrder;
 
 namespace EugeneC.ECS
 {
-    public struct RotatorIData : IComponentData
-    {
-        /// <summary>
-        /// Order the euler axes will be applied when converting to a quaternion before applying the rotation.
-        /// </summary>
-        public ERotationOrder RotationOrder;
-        public float3 EulerRadiansPerSecond;
-    }
-    
-    [DisallowMultipleComponent]
-    public sealed class RotatorAuthoring : MonoBehaviour
-    {
-        public ERotationOrder rotationOrder;
-        public float3 eulerRadiansPerSecond;
-        
-        private class RotatorBaker : Baker<RotatorAuthoring>
-        {
-            public override void Bake(RotatorAuthoring authoring)
-            {
-                var entity = GetEntity(TransformUsageFlags.Dynamic);
-                AddComponent(entity, new RotatorIData
-                {
-                    RotationOrder = authoring.rotationOrder,
-                    EulerRadiansPerSecond = authoring.eulerRadiansPerSecond
-                });
-            }
-        }
-    }
-    
-    [UpdateInGroup(typeof(Eu_PreTransformSystemGroup))]
+	public struct RotatorIData : IComponentData
+	{
+		/// <summary>
+		/// Order the euler axes will be applied when converting to a quaternion before applying the rotation.
+		/// </summary>
+		public ERotationOrder RotationOrder;
+
+		public float3 EulerRadiansPerSecond;
+	}
+
+	[DisallowMultipleComponent]
+	public sealed class RotatorAuthoring : MonoBehaviour
+	{
+		public ERotationOrder rotationOrder;
+		public float3 eulerRadiansPerSecond;
+
+		private class RotatorBaker : Baker<RotatorAuthoring>
+		{
+			public override void Bake(RotatorAuthoring authoring)
+			{
+				var entity = GetEntity(TransformUsageFlags.Dynamic);
+				AddComponent(entity, new RotatorIData
+				{
+					RotationOrder = authoring.rotationOrder,
+					EulerRadiansPerSecond = authoring.eulerRadiansPerSecond
+				});
+			}
+		}
+	}
+
+	[UpdateInGroup(typeof(Eu_PreTransformSystemGroup))]
 #if !UNITY_WEBGL
-    [BurstCompile]
+	[BurstCompile]
 #endif
-    public partial struct RotatorISystem : ISystem
-    {
+	public partial struct RotatorISystem : ISystem
+	{
 #if !UNITY_WEBGL
-        [BurstCompile]
+		[BurstCompile]
 #endif
-        public void OnUpdate(ref SystemState state)
-        {
-            var deltaTime = SystemAPI.Time.DeltaTime;
-            foreach (var (transform, rotatorData) in SystemAPI.Query<RefRW<LocalTransform>, RefRO<RotatorIData>>())
-            {
-                var rotationThisFrame = quaternion.Euler(rotatorData.ValueRO.EulerRadiansPerSecond * deltaTime, rotatorData.ValueRO.RotationOrder);
-                transform.ValueRW = transform.ValueRW.Rotate(rotationThisFrame);
-            }
-        }
-    }
+		public void OnUpdate(ref SystemState state)
+		{
+			var deltaTime = SystemAPI.Time.DeltaTime;
+			foreach (var (transform, rotatorData) in SystemAPI.Query<RefRW<LocalTransform>, RefRO<RotatorIData>>())
+			{
+				var rotationThisFrame = quaternion.Euler(rotatorData.ValueRO.EulerRadiansPerSecond * deltaTime,
+					rotatorData.ValueRO.RotationOrder);
+				transform.ValueRW = transform.ValueRW.Rotate(rotationThisFrame);
+			}
+		}
+	}
 }

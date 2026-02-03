@@ -11,7 +11,10 @@ Shader "Unlit/MediaPipe/Overlay Mask Shader"
 
     SubShader
     {
-        Tags { "Queue"="Transparent" "RenderType"="Transparent" }
+        Tags
+        {
+            "Queue"="Transparent" "RenderType"="Transparent"
+        }
         ZWrite Off
         Blend SrcAlpha OneMinusSrcAlpha
         LOD 100
@@ -20,20 +23,18 @@ Shader "Unlit/MediaPipe/Overlay Mask Shader"
         {
             CGPROGRAM
             #pragma vertex vert
-            #pragma fragment frag
+#pragma fragment frag
             // make fog work
-            #pragma multi_compile_fog
+#pragma multi_compile_fog
 
-            #include "UnityCG.cginc"
+#include "UnityCG.cginc"
 
-            struct appdata
-            {
+            struct appdata {
                 float4 vertex : POSITION;
                 float2 uv : TEXCOORD0;
             };
 
-            struct v2f
-            {
+            struct v2f {
                 float2 uv : TEXCOORD0;
                 UNITY_FOG_COORDS(1)
                 float4 vertex : SV_POSITION;
@@ -42,12 +43,11 @@ Shader "Unlit/MediaPipe/Overlay Mask Shader"
             sampler2D _MainTex;
             float4 _MainTex_ST;
 
-            v2f vert (appdata v)
-            {
+            v2f vert(appdata v) {
                 v2f o;
                 o.vertex = UnityObjectToClipPos(v.vertex);
                 o.uv = TRANSFORM_TEX(v.uv, _MainTex);
-                UNITY_TRANSFER_FOG(o,o.vertex);
+                UNITY_TRANSFER_FOG(o, o.vertex);
                 return o;
             }
 
@@ -58,8 +58,7 @@ Shader "Unlit/MediaPipe/Overlay Mask Shader"
             float _Threshold;
             uniform StructuredBuffer<float> _MaskBuffer;
 
-            fixed4 frag (v2f i) : SV_Target
-            {
+            fixed4 frag(v2f i) : SV_Target {
                 // sample the texture
                 fixed4 emptyCol = (0.0, 0.0, 0.0, 0.0);
                 fixed4 maskCol = tex2D(_MaskTex, i.uv);

@@ -13,28 +13,25 @@ Shader "Hidden/MrtColor"
         {
             HLSLPROGRAM
             #pragma vertex Vert
-            #pragma fragment frag
+#pragma fragment frag
 
-            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
-            #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/GlobalSamplers.hlsl"
+#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+#include "Packages/com.unity.render-pipelines.core/ShaderLibrary/GlobalSamplers.hlsl"
 
             TEXTURE2D_X(_ColorTexture);
 
-            struct Attributes
-            {
+            struct Attributes {
                 uint vertexID : SV_VertexID;
                 UNITY_VERTEX_INPUT_INSTANCE_ID
             };
 
-            struct Varyings
-            {
+            struct Varyings {
                 float4 positionCS : SV_POSITION;
-                float2 texcoord   : TEXCOORD0;
+                float2 texcoord : TEXCOORD0;
                 UNITY_VERTEX_OUTPUT_STEREO
             };
 
-            Varyings Vert(Attributes input)
-            {
+            Varyings Vert(Attributes input) {
                 Varyings output;
 
                 output.positionCS = GetFullScreenTriangleVertexPosition(input.vertexID);
@@ -42,19 +39,17 @@ Shader "Hidden/MrtColor"
 
                 return output;
             }
-    
+
 
             // MRT shader
-            struct FragmentOutput
-            {
+            struct FragmentOutput {
                 half4 dest0 : SV_Target0;
                 half4 dest1 : SV_Target1;
                 half4 dest2 : SV_Target2;
             };
 
-            FragmentOutput frag(Varyings input) : SV_Target
-            {
-                half4 color = SAMPLE_TEXTURE2D_X(_ColorTexture, sampler_LinearRepeat, input.texcoord); 
+            FragmentOutput frag(Varyings input) : SV_Target {
+                half4 color = SAMPLE_TEXTURE2D_X(_ColorTexture, sampler_LinearRepeat, input.texcoord);
                 FragmentOutput output;
                 output.dest0 = half4(color.r, 0.0, 0.0, 1.0);
                 output.dest1 = half4(0.0, color.g, 0.0, 1.0);

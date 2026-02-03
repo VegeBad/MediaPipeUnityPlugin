@@ -1,1 +1,34 @@
-{"assetModified":["Assets/Utils","Assets/Players","Assets/Level & Terrains","Assets/Props","Assets/Eugene Utilities","Assets/Synchrotron","Assets/Tea Framework","Assets/ChoyUtilities","Assets/Assignment","Assets/WeatherSystem","Assets/Main","Assets/StreamingAssets","Assets/ProjectionMapping","Assets/MediaPipeUnity"],"assetModifiedTexturePath":["Assets/Utils/Scripts/Editor/FolderColor/FolderCyan.png","Assets/Utils/Scripts/Editor/FolderColor/RedFolder.png","Assets/Utils/Scripts/Editor/FolderColor/BlueishGreenFolder.png","Assets/Utils/Scripts/Editor/FolderColor/FolderPurple.png","Assets/Eugene Utilities/Scripts/Editor/FolderColor/FolderBlue.png","Assets/Eugene Utilities/Scripts/Editor/FolderColor/RedFolder.png","Assets/Eugene Utilities/Scripts/Editor/FolderColor/BlueishGreenFolder.png","Assets/ChoyUtilities/Scripts/Editor/FolderColor/FolderBlue.png","Assets/ChoyUtilities/Scripts/Editor/FolderColor/RedFolder.png","Assets/ChoyUtilities/Scripts/Editor/FolderColor/RedFolder.png","Assets/ChoyEugene/ChoyUtilities/Scripts/Editor/FolderColor/RedFolder.png","Assets/ChoyEugene/ChoyUtilities/Scripts/Editor/FolderColor/BlackFolder.png","Assets/ChoyUtilities/Scripts/Editor/FolderColor/RedFolder.png","Assets/ChoyUtilities/Scripts/Editor/FolderColor/FolderPurple.png"]}
+{
+  "assetModified": [
+    "Assets/Utils",
+    "Assets/Players",
+    "Assets/Level & Terrains",
+    "Assets/Props",
+    "Assets/Eugene Utilities",
+    "Assets/Synchrotron",
+    "Assets/Tea Framework",
+    "Assets/ChoyUtilities",
+    "Assets/Assignment",
+    "Assets/WeatherSystem",
+    "Assets/Main",
+    "Assets/StreamingAssets",
+    "Assets/ProjectionMapping",
+    "Assets/MediaPipeUnity"
+  ],
+  "assetModifiedTexturePath": [
+    "Assets/Utils/Scripts/Editor/FolderColor/FolderCyan.png",
+    "Assets/Utils/Scripts/Editor/FolderColor/RedFolder.png",
+    "Assets/Utils/Scripts/Editor/FolderColor/BlueishGreenFolder.png",
+    "Assets/Utils/Scripts/Editor/FolderColor/FolderPurple.png",
+    "Assets/Eugene Utilities/Scripts/Editor/FolderColor/FolderBlue.png",
+    "Assets/Eugene Utilities/Scripts/Editor/FolderColor/RedFolder.png",
+    "Assets/Eugene Utilities/Scripts/Editor/FolderColor/BlueishGreenFolder.png",
+    "Assets/ChoyUtilities/Scripts/Editor/FolderColor/FolderBlue.png",
+    "Assets/ChoyUtilities/Scripts/Editor/FolderColor/RedFolder.png",
+    "Assets/ChoyUtilities/Scripts/Editor/FolderColor/RedFolder.png",
+    "Assets/ChoyEugene/ChoyUtilities/Scripts/Editor/FolderColor/RedFolder.png",
+    "Assets/ChoyEugene/ChoyUtilities/Scripts/Editor/FolderColor/BlackFolder.png",
+    "Assets/ChoyUtilities/Scripts/Editor/FolderColor/RedFolder.png",
+    "Assets/ChoyUtilities/Scripts/Editor/FolderColor/FolderPurple.png"
+  ]
+}

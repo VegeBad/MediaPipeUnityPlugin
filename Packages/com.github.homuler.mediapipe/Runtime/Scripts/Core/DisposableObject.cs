@@ -11,86 +11,93 @@ using System.Threading;
 
 namespace Mediapipe
 {
-  public abstract class DisposableObject : IDisposable
-  {
-    private volatile int _disposeSignaled = 0;
-    private bool _isLocked;
+	public abstract class DisposableObject : IDisposable
+	{
+		private volatile int _disposeSignaled = 0;
+		private bool _isLocked;
 
-    public bool isDisposed { get; protected set; }
-    protected bool isOwner { get; private set; }
+		public bool isDisposed { get; protected set; }
+		protected bool isOwner { get; private set; }
 
-    protected DisposableObject() : this(true) { }
+		protected DisposableObject() : this(true)
+		{
+		}
 
-    protected DisposableObject(bool isOwner)
-    {
-      isDisposed = false;
-      this.isOwner = isOwner;
-    }
+		protected DisposableObject(bool isOwner)
+		{
+			isDisposed = false;
+			this.isOwner = isOwner;
+		}
 
-    public void Dispose()
-    {
-      Dispose(true);
-      GC.SuppressFinalize(this);
-    }
+		public void Dispose()
+		{
+			Dispose(true);
+			GC.SuppressFinalize(this);
+		}
 
-    protected virtual void Dispose(bool disposing)
-    {
-      if (_isLocked)
-      {
-        throw new InvalidOperationException("Cannot dispose a locked object, unlock it first");
-      }
+		protected virtual void Dispose(bool disposing)
+		{
+			if (_isLocked)
+			{
+				throw new InvalidOperationException("Cannot dispose a locked object, unlock it first");
+			}
 
-      if (Interlocked.Exchange(ref _disposeSignaled, 1) != 0)
-      {
-        return;
-      }
+			if (Interlocked.Exchange(ref _disposeSignaled, 1) != 0)
+			{
+				return;
+			}
 
-      isDisposed = true;
+			isDisposed = true;
 
-      if (disposing)
-      {
-        DisposeManaged();
-      }
-      DisposeUnmanaged();
-    }
+			if (disposing)
+			{
+				DisposeManaged();
+			}
 
-    ~DisposableObject()
-    {
-      Dispose(false);
-    }
+			DisposeUnmanaged();
+		}
 
-    protected virtual void DisposeManaged() { }
+		~DisposableObject()
+		{
+			Dispose(false);
+		}
 
-    protected virtual void DisposeUnmanaged() { }
+		protected virtual void DisposeManaged()
+		{
+		}
 
-    /// <summary>
-    ///   Lock the object to prevent it from being disposed.
-    /// </summary>
-    internal void Lock()
-    {
-      _isLocked = true;
-    }
+		protected virtual void DisposeUnmanaged()
+		{
+		}
 
-    /// <summary>
-    ///   Unlock the object to allow it to be disposed.
-    /// </summary>
-    internal void Unlock()
-    {
-      _isLocked = false;
-    }
+		/// <summary>
+		///   Lock the object to prevent it from being disposed.
+		/// </summary>
+		internal void Lock()
+		{
+			_isLocked = true;
+		}
 
-    /// <summary>Relinquish the ownership</summary>
-    protected void TransferOwnership()
-    {
-      isOwner = false;
-    }
+		/// <summary>
+		///   Unlock the object to allow it to be disposed.
+		/// </summary>
+		internal void Unlock()
+		{
+			_isLocked = false;
+		}
 
-    protected void ThrowIfDisposed()
-    {
-      if (isDisposed)
-      {
-        throw new ObjectDisposedException(GetType().FullName);
-      }
-    }
-  }
+		/// <summary>Relinquish the ownership</summary>
+		protected void TransferOwnership()
+		{
+			isOwner = false;
+		}
+
+		protected void ThrowIfDisposed()
+		{
+			if (isDisposed)
+			{
+				throw new ObjectDisposedException(GetType().FullName);
+			}
+		}
+	}
 }

@@ -1,0 +1,3 @@
+Notes:
+
+1. In "Main Canvas" I have rotated "Body" 180 to reverse the mirror effect. If wants to do webcam mode just rotate it back

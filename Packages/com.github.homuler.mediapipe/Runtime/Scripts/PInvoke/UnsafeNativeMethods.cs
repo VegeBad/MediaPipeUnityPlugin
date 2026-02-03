@@ -10,12 +10,12 @@ using System.Runtime.InteropServices;
 
 namespace Mediapipe
 {
-  [SuppressUnmanagedCodeSecurity]
-  internal static partial class UnsafeNativeMethods
-  {
-    internal const string MediaPipeLibrary =
+	[SuppressUnmanagedCodeSecurity]
+	internal static partial class UnsafeNativeMethods
+	{
+		internal const string MediaPipeLibrary =
 #if UNITY_EDITOR
-      "mediapipe_c";
+			"mediapipe_c";
 #elif UNITY_IOS || UNITY_WEBGL
       "__Internal";
 #elif UNITY_ANDROID
@@ -24,20 +24,21 @@ namespace Mediapipe
       "mediapipe_c";
 #endif
 
-    static UnsafeNativeMethods()
-    {
-      mp_api__SetFreeHGlobal(FreeHGlobal);
-    }
+		static UnsafeNativeMethods()
+		{
+			mp_api__SetFreeHGlobal(FreeHGlobal);
+		}
 
-    private delegate void FreeHGlobalDelegate(IntPtr hglobal);
+		private delegate void FreeHGlobalDelegate(IntPtr hglobal);
 
-    [AOT.MonoPInvokeCallback(typeof(FreeHGlobalDelegate))]
-    private static void FreeHGlobal(IntPtr hglobal)
-    {
-      Marshal.FreeHGlobal(hglobal);
-    }
+		[AOT.MonoPInvokeCallback(typeof(FreeHGlobalDelegate))]
+		private static void FreeHGlobal(IntPtr hglobal)
+		{
+			Marshal.FreeHGlobal(hglobal);
+		}
 
-    [DllImport(MediaPipeLibrary, ExactSpelling = true)]
-    private static extern void mp_api__SetFreeHGlobal([MarshalAs(UnmanagedType.FunctionPtr)] FreeHGlobalDelegate freeHGlobal);
-  }
+		[DllImport(MediaPipeLibrary, ExactSpelling = true)]
+		private static extern void mp_api__SetFreeHGlobal(
+			[MarshalAs(UnmanagedType.FunctionPtr)] FreeHGlobalDelegate freeHGlobal);
+	}
 }

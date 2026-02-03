@@ -9,25 +9,25 @@ using System.Runtime.InteropServices;
 
 namespace Mediapipe
 {
-  [StructLayout(LayoutKind.Sequential)]
-  internal readonly struct NativeMatrix
-  {
-    private readonly IntPtr _data;
-    public readonly int rows;
-    public readonly int cols;
-    public readonly int layout;
+	[StructLayout(LayoutKind.Sequential)]
+	internal readonly struct NativeMatrix
+	{
+		private readonly IntPtr _data;
+		public readonly int rows;
+		public readonly int cols;
+		public readonly int layout;
 
-    public void Dispose()
-    {
-      UnsafeNativeMethods.mp_api_Matrix__delete(this);
-    }
+		public void Dispose()
+		{
+			UnsafeNativeMethods.mp_api_Matrix__delete(this);
+		}
 
-    public ReadOnlySpan<float> AsReadOnlySpan()
-    {
-      unsafe
-      {
-        return new ReadOnlySpan<float>((float*)_data, rows * cols);
-      }
-    }
-  }
+		public ReadOnlySpan<float> AsReadOnlySpan()
+		{
+			unsafe
+			{
+				return new ReadOnlySpan<float>((float*)_data, rows * cols);
+			}
+		}
+	}
 }

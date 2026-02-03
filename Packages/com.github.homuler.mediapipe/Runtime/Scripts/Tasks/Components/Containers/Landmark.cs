@@ -12,291 +12,301 @@ using Mathf = UnityEngine.Mathf;
 
 namespace Mediapipe.Tasks.Components.Containers
 {
-  /// <summary>
-  ///   Landmark represents a point in 3D space with x, y, z coordinates. The
-  ///   landmark coordinates are in meters. z represents the landmark depth, and the
-  ///   smaller the value the closer the world landmark is to the camera.
-  /// </summary>
-  public readonly struct Landmark : IEquatable<Landmark>
-  {
-    private const float _LandmarkTolerance = 1e-6f;
+	/// <summary>
+	///   Landmark represents a point in 3D space with x, y, z coordinates. The
+	///   landmark coordinates are in meters. z represents the landmark depth, and the
+	///   smaller the value the closer the world landmark is to the camera.
+	/// </summary>
+	public readonly struct Landmark : IEquatable<Landmark>
+	{
+		private const float _LandmarkTolerance = 1e-6f;
 
-    public readonly float x;
-    public readonly float y;
-    public readonly float z;
-    /// <summary>
-    ///   Landmark visibility. Should stay unset if not supported.
-    ///   Float score of whether landmark is visible or occluded by other objects.
-    ///   Landmark considered as invisible also if it is not present on the screen
-    ///   (out of scene bounds). Depending on the model, visibility value is either a
-    ///   sigmoid or an argument of sigmoid.
-    /// </summary>
-    public readonly float? visibility;
-    /// <summary>
-    ///   Landmark presence. Should stay unset if not supported.
-    ///   Float score of whether landmark is present on the scene (located within
-    ///   scene bounds). Depending on the model, presence value is either a result of
-    ///   sigmoid or an argument of sigmoid function to get landmark presence
-    ///   probability.
-    /// </summary>
-    public readonly float? presence;
-    /// <summary>
-    ///   Landmark name. Should stay unset if not supported.
-    /// </summary>
-    public readonly string name;
+		public readonly float x;
+		public readonly float y;
+		public readonly float z;
 
-    internal Landmark(float x, float y, float z, float? visibility, float? presence) : this(x, y, z, visibility, presence, null)
-    {
-    }
+		/// <summary>
+		///   Landmark visibility. Should stay unset if not supported.
+		///   Float score of whether landmark is visible or occluded by other objects.
+		///   Landmark considered as invisible also if it is not present on the screen
+		///   (out of scene bounds). Depending on the model, visibility value is either a
+		///   sigmoid or an argument of sigmoid.
+		/// </summary>
+		public readonly float? visibility;
 
-    internal Landmark(float x, float y, float z, float? visibility, float? presence, string name)
-    {
-      this.x = x;
-      this.y = y;
-      this.z = z;
-      this.visibility = visibility;
-      this.presence = presence;
-      this.name = name;
-    }
+		/// <summary>
+		///   Landmark presence. Should stay unset if not supported.
+		///   Float score of whether landmark is present on the scene (located within
+		///   scene bounds). Depending on the model, presence value is either a result of
+		///   sigmoid or an argument of sigmoid function to get landmark presence
+		///   probability.
+		/// </summary>
+		public readonly float? presence;
 
-    internal Landmark(NativeLandmark nativeLandmark) : this(
-      nativeLandmark.x, nativeLandmark.y, nativeLandmark.z,
+		/// <summary>
+		///   Landmark name. Should stay unset if not supported.
+		/// </summary>
+		public readonly string name;
+
+		internal Landmark(float x, float y, float z, float? visibility, float? presence) : this(x, y, z, visibility,
+			presence, null)
+		{
+		}
+
+		internal Landmark(float x, float y, float z, float? visibility, float? presence, string name)
+		{
+			this.x = x;
+			this.y = y;
+			this.z = z;
+			this.visibility = visibility;
+			this.presence = presence;
+			this.name = name;
+		}
+
+		internal Landmark(NativeLandmark nativeLandmark) : this(
+			nativeLandmark.x, nativeLandmark.y, nativeLandmark.z,
 #pragma warning disable IDE0004 // for Unity 2020.3.x
-      nativeLandmark.hasVisibility ? (float?)nativeLandmark.visibility : null,
-      nativeLandmark.hasPresence ? (float?)nativeLandmark.presence : null,
+			nativeLandmark.hasVisibility ? (float?)nativeLandmark.visibility : null,
+			nativeLandmark.hasPresence ? (float?)nativeLandmark.presence : null,
 #pragma warning restore IDE0004 // for Unity 2020.3.x
-      nativeLandmark.name
-    )
-    {
-    }
+			nativeLandmark.name
+		)
+		{
+		}
 
 #nullable enable
-    public override bool Equals(object? obj) => obj is Landmark other && Equals(other);
+		public override bool Equals(object? obj) => obj is Landmark other && Equals(other);
 #nullable disable
 
-    bool IEquatable<Landmark>.Equals(Landmark other)
-    {
-      return Mathf.Abs(x - other.x) < _LandmarkTolerance &&
-        Mathf.Abs(y - other.y) < _LandmarkTolerance &&
-        Mathf.Abs(z - other.z) < _LandmarkTolerance;
-    }
+		bool IEquatable<Landmark>.Equals(Landmark other)
+		{
+			return Mathf.Abs(x - other.x) < _LandmarkTolerance &&
+			       Mathf.Abs(y - other.y) < _LandmarkTolerance &&
+			       Mathf.Abs(z - other.z) < _LandmarkTolerance;
+		}
 
-    // TODO: use HashCode.Combine
-    public override int GetHashCode() => Tuple.Create(x, y, z).GetHashCode();
-    public static bool operator ==(in Landmark lhs, in Landmark rhs) => lhs.Equals(rhs);
-    public static bool operator !=(in Landmark lhs, in Landmark rhs) => !(lhs == rhs);
+		// TODO: use HashCode.Combine
+		public override int GetHashCode() => Tuple.Create(x, y, z).GetHashCode();
+		public static bool operator ==(in Landmark lhs, in Landmark rhs) => lhs.Equals(rhs);
+		public static bool operator !=(in Landmark lhs, in Landmark rhs) => !(lhs == rhs);
 
-    public static Landmark CreateFrom(Mediapipe.Landmark proto)
-    {
-      return new Landmark(
-        proto.X, proto.Y, proto.Z,
+		public static Landmark CreateFrom(Mediapipe.Landmark proto)
+		{
+			return new Landmark(
+				proto.X, proto.Y, proto.Z,
 #pragma warning disable IDE0004 // for Unity 2020.3.x
-        proto.HasVisibility ? (float?)proto.Visibility : null,
-        proto.HasPresence ? (float?)proto.Presence : null
+				proto.HasVisibility ? (float?)proto.Visibility : null,
+				proto.HasPresence ? (float?)proto.Presence : null
 #pragma warning restore IDE0004 // for Unity 2020.3.x
-      );
-    }
+			);
+		}
 
-    public override string ToString()
-      => $"{{ \"x\": {x}, \"y\": {y}, \"z\": {z}, \"visibility\": {Util.Format(visibility)}, \"presence\": {Util.Format(presence)}, \"name\": \"{name}\" }}";
-  }
+		public override string ToString()
+			=>
+				$"{{ \"x\": {x}, \"y\": {y}, \"z\": {z}, \"visibility\": {Util.Format(visibility)}, \"presence\": {Util.Format(presence)}, \"name\": \"{name}\" }}";
+	}
 
-  /// <summary>
-  ///   A normalized version of above Landmark struct. All coordinates should be
-  ///   within [0, 1].
-  /// </summary>
-  public readonly struct NormalizedLandmark : IEquatable<NormalizedLandmark>
-  {
-    private const float _LandmarkTolerance = 1e-6f;
+	/// <summary>
+	///   A normalized version of above Landmark struct. All coordinates should be
+	///   within [0, 1].
+	/// </summary>
+	public readonly struct NormalizedLandmark : IEquatable<NormalizedLandmark>
+	{
+		private const float _LandmarkTolerance = 1e-6f;
 
-    public readonly float x;
-    public readonly float y;
-    public readonly float z;
-    public readonly float? visibility;
-    public readonly float? presence;
-    public readonly string name;
+		public readonly float x;
+		public readonly float y;
+		public readonly float z;
+		public readonly float? visibility;
+		public readonly float? presence;
+		public readonly string name;
 
-    internal NormalizedLandmark(float x, float y, float z, float? visibility, float? presence) : this(x, y, z, visibility, presence, null)
-    {
-    }
+		internal NormalizedLandmark(float x, float y, float z, float? visibility, float? presence) : this(x, y, z,
+			visibility, presence, null)
+		{
+		}
 
-    internal NormalizedLandmark(float x, float y, float z, float? visibility, float? presence, string name)
-    {
-      this.x = x;
-      this.y = y;
-      this.z = z;
-      this.visibility = visibility;
-      this.presence = presence;
-      this.name = name;
-    }
+		internal NormalizedLandmark(float x, float y, float z, float? visibility, float? presence, string name)
+		{
+			this.x = x;
+			this.y = y;
+			this.z = z;
+			this.visibility = visibility;
+			this.presence = presence;
+			this.name = name;
+		}
 
-    internal NormalizedLandmark(NativeNormalizedLandmark nativeLandmark) : this(
-      nativeLandmark.x, nativeLandmark.y, nativeLandmark.z,
+		internal NormalizedLandmark(NativeNormalizedLandmark nativeLandmark) : this(
+			nativeLandmark.x, nativeLandmark.y, nativeLandmark.z,
 #pragma warning disable IDE0004 // for Unity 2020.3.x
-      nativeLandmark.hasVisibility ? (float?)nativeLandmark.visibility : null,
-      nativeLandmark.hasPresence ? (float?)nativeLandmark.presence : null,
+			nativeLandmark.hasVisibility ? (float?)nativeLandmark.visibility : null,
+			nativeLandmark.hasPresence ? (float?)nativeLandmark.presence : null,
 #pragma warning restore IDE0004 // for Unity 2020.3.x
-      nativeLandmark.name
-    )
-    {
-    }
+			nativeLandmark.name
+		)
+		{
+		}
 
 #nullable enable
-    public override bool Equals(object? obj) => obj is NormalizedLandmark other && Equals(other);
+		public override bool Equals(object? obj) => obj is NormalizedLandmark other && Equals(other);
 #nullable disable
 
-    bool IEquatable<NormalizedLandmark>.Equals(NormalizedLandmark other)
-    {
-      return Mathf.Abs(x - other.x) < _LandmarkTolerance &&
-        Mathf.Abs(y - other.y) < _LandmarkTolerance &&
-        Mathf.Abs(z - other.z) < _LandmarkTolerance;
-    }
+		bool IEquatable<NormalizedLandmark>.Equals(NormalizedLandmark other)
+		{
+			return Mathf.Abs(x - other.x) < _LandmarkTolerance &&
+			       Mathf.Abs(y - other.y) < _LandmarkTolerance &&
+			       Mathf.Abs(z - other.z) < _LandmarkTolerance;
+		}
 
-    // TODO: use HashCode.Combine
-    public override int GetHashCode() => Tuple.Create(x, y, z).GetHashCode();
-    public static bool operator ==(in NormalizedLandmark lhs, in NormalizedLandmark rhs) => lhs.Equals(rhs);
-    public static bool operator !=(in NormalizedLandmark lhs, in NormalizedLandmark rhs) => !(lhs == rhs);
+		// TODO: use HashCode.Combine
+		public override int GetHashCode() => Tuple.Create(x, y, z).GetHashCode();
+		public static bool operator ==(in NormalizedLandmark lhs, in NormalizedLandmark rhs) => lhs.Equals(rhs);
+		public static bool operator !=(in NormalizedLandmark lhs, in NormalizedLandmark rhs) => !(lhs == rhs);
 
-    public static NormalizedLandmark CreateFrom(Mediapipe.NormalizedLandmark proto)
-    {
-      return new NormalizedLandmark(
-        proto.X, proto.Y, proto.Z,
+		public static NormalizedLandmark CreateFrom(Mediapipe.NormalizedLandmark proto)
+		{
+			return new NormalizedLandmark(
+				proto.X, proto.Y, proto.Z,
 #pragma warning disable IDE0004 // for Unity 2020.3.x
-        proto.HasVisibility ? (float?)proto.Visibility : null,
-        proto.HasPresence ? (float?)proto.Presence : null
+				proto.HasVisibility ? (float?)proto.Visibility : null,
+				proto.HasPresence ? (float?)proto.Presence : null
 #pragma warning restore IDE0004 // for Unity 2020.3.x
-      );
-    }
+			);
+		}
 
-    public override string ToString()
-      => $"{{ \"x\": {x}, \"y\": {y}, \"z\": {z}, \"visibility\": {Util.Format(visibility)}, \"presence\": {Util.Format(presence)}, \"name\": \"{name}\" }}";
-  }
+		public override string ToString()
+			=>
+				$"{{ \"x\": {x}, \"y\": {y}, \"z\": {z}, \"visibility\": {Util.Format(visibility)}, \"presence\": {Util.Format(presence)}, \"name\": \"{name}\" }}";
+	}
 
-  /// <summary>
-  ///   A list of Landmarks.
-  /// </summary>
-  public readonly struct Landmarks
-  {
-    public readonly List<Landmark> landmarks;
+	/// <summary>
+	///   A list of Landmarks.
+	/// </summary>
+	public readonly struct Landmarks
+	{
+		public readonly List<Landmark> landmarks;
 
-    internal Landmarks(List<Landmark> landmarks)
-    {
-      this.landmarks = landmarks;
-    }
+		internal Landmarks(List<Landmark> landmarks)
+		{
+			this.landmarks = landmarks;
+		}
 
-    public static Landmarks Alloc(int capacity) => new Landmarks(new List<Landmark>(capacity));
+		public static Landmarks Alloc(int capacity) => new Landmarks(new List<Landmark>(capacity));
 
-    public static Landmarks CreateFrom(LandmarkList proto)
-    {
-      var result = default(Landmarks);
+		public static Landmarks CreateFrom(LandmarkList proto)
+		{
+			var result = default(Landmarks);
 
-      Copy(proto, ref result);
-      return result;
-    }
+			Copy(proto, ref result);
+			return result;
+		}
 
-    public static void Copy(LandmarkList source, ref Landmarks destination)
-    {
-      var landmarks = destination.landmarks ?? new List<Landmark>(source.Landmark.Count);
-      landmarks.Clear();
-      for (var i = 0; i < source.Landmark.Count; i++)
-      {
-        landmarks.Add(Landmark.CreateFrom(source.Landmark[i]));
-      }
+		public static void Copy(LandmarkList source, ref Landmarks destination)
+		{
+			var landmarks = destination.landmarks ?? new List<Landmark>(source.Landmark.Count);
+			landmarks.Clear();
+			for (var i = 0; i < source.Landmark.Count; i++)
+			{
+				landmarks.Add(Landmark.CreateFrom(source.Landmark[i]));
+			}
 
-      destination = new Landmarks(landmarks);
-    }
+			destination = new Landmarks(landmarks);
+		}
 
-    internal static void Copy(NativeLandmarks source, ref Landmarks destination)
-    {
-      var landmarks = destination.landmarks ?? new List<Landmark>((int)source.landmarksCount);
-      landmarks.Clear();
+		internal static void Copy(NativeLandmarks source, ref Landmarks destination)
+		{
+			var landmarks = destination.landmarks ?? new List<Landmark>((int)source.landmarksCount);
+			landmarks.Clear();
 
-      foreach (var nativeLandmark in source.AsReadOnlySpan())
-      {
-        landmarks.Add(new Landmark(nativeLandmark));
-      }
-      destination = new Landmarks(landmarks);
-    }
+			foreach (var nativeLandmark in source.AsReadOnlySpan())
+			{
+				landmarks.Add(new Landmark(nativeLandmark));
+			}
 
-    public void CloneTo(ref Landmarks destination)
-    {
-      if (landmarks == null)
-      {
-        destination = default;
-        return;
-      }
+			destination = new Landmarks(landmarks);
+		}
 
-      var dstLandmarks = destination.landmarks ?? new List<Landmark>(landmarks.Count);
-      dstLandmarks.Clear();
-      dstLandmarks.AddRange(landmarks);
+		public void CloneTo(ref Landmarks destination)
+		{
+			if (landmarks == null)
+			{
+				destination = default;
+				return;
+			}
 
-      destination = new Landmarks(dstLandmarks);
-    }
+			var dstLandmarks = destination.landmarks ?? new List<Landmark>(landmarks.Count);
+			dstLandmarks.Clear();
+			dstLandmarks.AddRange(landmarks);
 
-    public override string ToString() => $"{{ \"landmarks\": {Util.Format(landmarks)} }}";
-  }
+			destination = new Landmarks(dstLandmarks);
+		}
 
-  /// <summary>
-  ///   A list of NormalizedLandmarks.
-  /// </summary>
-  public readonly struct NormalizedLandmarks
-  {
-    public readonly List<NormalizedLandmark> landmarks;
+		public override string ToString() => $"{{ \"landmarks\": {Util.Format(landmarks)} }}";
+	}
 
-    internal NormalizedLandmarks(List<NormalizedLandmark> landmarks)
-    {
-      this.landmarks = landmarks;
-    }
+	/// <summary>
+	///   A list of NormalizedLandmarks.
+	/// </summary>
+	public readonly struct NormalizedLandmarks
+	{
+		public readonly List<NormalizedLandmark> landmarks;
 
-    public static NormalizedLandmarks Alloc(int capacity) => new NormalizedLandmarks(new List<NormalizedLandmark>(capacity));
+		internal NormalizedLandmarks(List<NormalizedLandmark> landmarks)
+		{
+			this.landmarks = landmarks;
+		}
 
-    public static NormalizedLandmarks CreateFrom(NormalizedLandmarkList proto)
-    {
-      var result = default(NormalizedLandmarks);
+		public static NormalizedLandmarks Alloc(int capacity) =>
+			new NormalizedLandmarks(new List<NormalizedLandmark>(capacity));
 
-      Copy(proto, ref result);
-      return result;
-    }
+		public static NormalizedLandmarks CreateFrom(NormalizedLandmarkList proto)
+		{
+			var result = default(NormalizedLandmarks);
 
-    public static void Copy(NormalizedLandmarkList source, ref NormalizedLandmarks destination)
-    {
-      var landmarks = destination.landmarks ?? new List<NormalizedLandmark>(source.Landmark.Count);
-      landmarks.Clear();
-      for (var i = 0; i < source.Landmark.Count; i++)
-      {
-        landmarks.Add(NormalizedLandmark.CreateFrom(source.Landmark[i]));
-      }
+			Copy(proto, ref result);
+			return result;
+		}
 
-      destination = new NormalizedLandmarks(landmarks);
-    }
+		public static void Copy(NormalizedLandmarkList source, ref NormalizedLandmarks destination)
+		{
+			var landmarks = destination.landmarks ?? new List<NormalizedLandmark>(source.Landmark.Count);
+			landmarks.Clear();
+			for (var i = 0; i < source.Landmark.Count; i++)
+			{
+				landmarks.Add(NormalizedLandmark.CreateFrom(source.Landmark[i]));
+			}
 
-    internal static void Copy(NativeNormalizedLandmarks source, ref NormalizedLandmarks destination)
-    {
-      var landmarks = destination.landmarks ?? new List<NormalizedLandmark>((int)source.landmarksCount);
-      landmarks.Clear();
+			destination = new NormalizedLandmarks(landmarks);
+		}
 
-      foreach (var nativeLandmark in source.AsReadOnlySpan())
-      {
-        landmarks.Add(new NormalizedLandmark(nativeLandmark));
-      }
-      destination = new NormalizedLandmarks(landmarks);
-    }
+		internal static void Copy(NativeNormalizedLandmarks source, ref NormalizedLandmarks destination)
+		{
+			var landmarks = destination.landmarks ?? new List<NormalizedLandmark>((int)source.landmarksCount);
+			landmarks.Clear();
 
-    public void CloneTo(ref NormalizedLandmarks destination)
-    {
-      if (landmarks == null)
-      {
-        destination = default;
-        return;
-      }
+			foreach (var nativeLandmark in source.AsReadOnlySpan())
+			{
+				landmarks.Add(new NormalizedLandmark(nativeLandmark));
+			}
 
-      var dstLandmarks = destination.landmarks ?? new List<NormalizedLandmark>(landmarks.Count);
-      dstLandmarks.Clear();
-      dstLandmarks.AddRange(landmarks);
+			destination = new NormalizedLandmarks(landmarks);
+		}
 
-      destination = new NormalizedLandmarks(dstLandmarks);
-    }
+		public void CloneTo(ref NormalizedLandmarks destination)
+		{
+			if (landmarks == null)
+			{
+				destination = default;
+				return;
+			}
 
-    public override string ToString() => $"{{ \"landmarks\": {Util.Format(landmarks)} }}";
-  }
+			var dstLandmarks = destination.landmarks ?? new List<NormalizedLandmark>(landmarks.Count);
+			dstLandmarks.Clear();
+			dstLandmarks.AddRange(landmarks);
+
+			destination = new NormalizedLandmarks(dstLandmarks);
+		}
+
+		public override string ToString() => $"{{ \"landmarks\": {Util.Format(landmarks)} }}";
+	}
 }

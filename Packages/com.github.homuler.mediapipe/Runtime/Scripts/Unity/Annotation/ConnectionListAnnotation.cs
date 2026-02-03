@@ -11,80 +11,79 @@ using UnityEngine;
 namespace Mediapipe.Unity
 {
 #pragma warning disable IDE0065
-  using Color = UnityEngine.Color;
+	using Color = UnityEngine.Color;
+
 #pragma warning restore IDE0065
 
-  public sealed class ConnectionListAnnotation : ListAnnotation<ConnectionAnnotation>
-  {
-    [SerializeField] private Color _color = Color.red;
-    [SerializeField, Range(0, 1)] private float _lineWidth = 1.0f;
+	public sealed class ConnectionListAnnotation : ListAnnotation<ConnectionAnnotation>
+	{
+		[SerializeField] private Color color = Color.red;
+		[SerializeField, Range(0, 1)] private float lineWidth = 1.0f;
 
 #if UNITY_EDITOR
-    private void OnValidate()
-    {
-      if (!UnityEditor.PrefabUtility.IsPartOfAnyPrefab(this))
-      {
-        ApplyColor(_color);
-        ApplyLineWidth(_lineWidth);
-      }
-    }
+		private void OnValidate()
+		{
+			if (UnityEditor.PrefabUtility.IsPartOfAnyPrefab(this)) return;
+			ApplyColor(color);
+			ApplyLineWidth(lineWidth);
+		}
 #endif
 
-    public void Fill(IReadOnlyList<(int, int)> connections, PointListAnnotation points)
-    {
-      Draw(connections.Select(pair => new Connection(points[pair.Item1], points[pair.Item2])).ToList());
-    }
+		public void Fill(IReadOnlyList<(int, int)> connections, PointListAnnotation points)
+		{
+			Draw(connections.Select(pair => new Connection(points[pair.Item1], points[pair.Item2])).ToList());
+		}
 
-    public void SetColor(Color color)
-    {
-      _color = color;
-      ApplyColor(color);
-    }
+		public void SetColor(Color col)
+		{
+			color = col;
+			ApplyColor(color);
+		}
 
-    public void SetLineWidth(float lineWidth)
-    {
-      _lineWidth = lineWidth;
-      ApplyLineWidth(lineWidth);
-    }
+		public void SetLineWidth(float width)
+		{
+			lineWidth = width;
+			ApplyLineWidth(lineWidth);
+		}
 
-    public void Draw(IReadOnlyList<Connection> targets)
-    {
-      if (ActivateFor(targets))
-      {
-        CallActionForAll(targets, (annotation, target) => { if (annotation != null) { annotation.Draw(target); } });
-      }
-    }
+		public void Draw(IReadOnlyList<Connection> targets)
+		{
+			if (ActivateFor(targets))
+			{
+				CallActionForAll(targets, (annotation, target) => annotation?.Draw(target));
+			}
+		}
 
-    public void Redraw()
-    {
-      foreach (var connection in children)
-      {
-        if (connection != null) { connection.Redraw(); }
-      }
-    }
+		public void Redraw()
+		{
+			foreach (var connection in children)
+			{
+				connection?.Redraw();
+			}
+		}
 
-    protected override ConnectionAnnotation InstantiateChild(bool isActive = true)
-    {
-      var annotation = base.InstantiateChild(isActive);
-      annotation.SetColor(_color);
-      annotation.SetLineWidth(_lineWidth);
-      return annotation;
-    }
+		protected override ConnectionAnnotation InstantiateChild(bool isActive = true)
+		{
+			var annotation = base.InstantiateChild(isActive);
+			annotation.SetColor(color);
+			annotation.SetLineWidth(lineWidth);
+			return annotation;
+		}
 
-    private void ApplyColor(Color color)
-    {
-      foreach (var line in children)
-      {
-        if (line != null) { line.SetColor(color); }
-      }
-    }
+		private void ApplyColor(Color col)
+		{
+			foreach (var line in children)
+			{
+				line?.SetColor(col);
+			}
+		}
 
-    private void ApplyLineWidth(float lineWidth)
-    {
-      foreach (var line in children)
-      {
-        if (line != null) { line.SetLineWidth(lineWidth); }
-      }
-    }
-  }
+		private void ApplyLineWidth(float width)
+		{
+			foreach (var line in children)
+			{
+				line?.SetLineWidth(width);
+			}
+		}
+	}
 }

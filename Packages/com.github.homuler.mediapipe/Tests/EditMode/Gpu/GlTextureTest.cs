@@ -8,49 +8,55 @@ using NUnit.Framework;
 
 namespace Mediapipe.Tests
 {
-  public class GlTextureTest
-  {
-    #region Constructor
-    [Test, GpuOnly]
-    public void Ctor_ShouldInstantiateGlTexture_When_CalledWithNoArguments()
-    {
-      using (var glTexture = new GlTexture())
-      {
-        Assert.AreEqual(0, glTexture.width);
-        Assert.AreEqual(0, glTexture.height);
-      }
-    }
-    #endregion
+	public class GlTextureTest
+	{
+		#region Constructor
 
-    #region #isDisposed
-    [Test, GpuOnly]
-    public void IsDisposed_ShouldReturnFalse_When_NotDisposedYet()
-    {
-      using (var glTexture = new GlTexture())
-      {
-        Assert.False(glTexture.isDisposed);
-      }
-    }
+		[Test, GpuOnly]
+		public void Ctor_ShouldInstantiateGlTexture_When_CalledWithNoArguments()
+		{
+			using (var glTexture = new GlTexture())
+			{
+				Assert.AreEqual(0, glTexture.width);
+				Assert.AreEqual(0, glTexture.height);
+			}
+		}
 
-    [Test, GpuOnly]
-    public void IsDisposed_ShouldReturnTrue_When_AlreadyDisposed()
-    {
-      var glTexture = new GlTexture();
-      glTexture.Dispose();
+		#endregion
 
-      Assert.True(glTexture.isDisposed);
-    }
-    #endregion
+		#region #isDisposed
 
-    #region target
-    [Test, GpuOnly]
-    public void Target_ShouldReturnTarget()
-    {
-      using (var glTexture = new GlTexture())
-      {
-        Assert.AreEqual(Gl.GL_TEXTURE_2D, glTexture.target);
-      }
-    }
-    #endregion
-  }
+		[Test, GpuOnly]
+		public void IsDisposed_ShouldReturnFalse_When_NotDisposedYet()
+		{
+			using (var glTexture = new GlTexture())
+			{
+				Assert.False(glTexture.isDisposed);
+			}
+		}
+
+		[Test, GpuOnly]
+		public void IsDisposed_ShouldReturnTrue_When_AlreadyDisposed()
+		{
+			var glTexture = new GlTexture();
+			glTexture.Dispose();
+
+			Assert.True(glTexture.isDisposed);
+		}
+
+		#endregion
+
+		#region target
+
+		[Test, GpuOnly]
+		public void Target_ShouldReturnTarget()
+		{
+			using (var glTexture = new GlTexture())
+			{
+				Assert.AreEqual(Gl.GL_TEXTURE_2D, glTexture.target);
+			}
+		}
+
+		#endregion
+	}
 }

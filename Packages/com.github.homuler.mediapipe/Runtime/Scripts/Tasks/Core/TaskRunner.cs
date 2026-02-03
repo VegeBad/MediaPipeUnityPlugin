@@ -9,82 +9,93 @@ using Google.Protobuf;
 
 namespace Mediapipe.Tasks.Core
 {
-  public class TaskRunner : MpResourceHandle
-  {
-    public delegate void NativePacketsCallback(int name, IntPtr status, IntPtr packetMap);
-    public delegate void PacketsCallback(PacketMap packetMap);
+	public class TaskRunner : MpResourceHandle
+	{
+		public delegate void NativePacketsCallback(int name, IntPtr status, IntPtr packetMap);
 
-    public static TaskRunner Create(CalculatorGraphConfig config, GpuResources gpuResources, int callbackId = -1, NativePacketsCallback packetsCallback = null)
-    {
-      var bytes = config.ToByteArray();
-      var gpuResourcesPtr = gpuResources == null ? IntPtr.Zero : gpuResources.sharedPtr;
-      UnsafeNativeMethods.mp_tasks_core_TaskRunner_Create__PKc_i_PF_Pgr(bytes, bytes.Length, callbackId, packetsCallback, gpuResourcesPtr, out var statusPtr, out var taskRunnerPtr).Assert();
+		public delegate void PacketsCallback(PacketMap packetMap);
 
-      AssertStatusOk(statusPtr);
-      return new TaskRunner(taskRunnerPtr);
-    }
+		public static TaskRunner Create(CalculatorGraphConfig config, GpuResources gpuResources, int callbackId = -1,
+			NativePacketsCallback packetsCallback = null)
+		{
+			var bytes = config.ToByteArray();
+			var gpuResourcesPtr = gpuResources == null ? IntPtr.Zero : gpuResources.sharedPtr;
+			UnsafeNativeMethods.mp_tasks_core_TaskRunner_Create__PKc_i_PF_Pgr(bytes, bytes.Length, callbackId,
+				packetsCallback, gpuResourcesPtr, out var statusPtr, out var taskRunnerPtr).Assert();
 
-    public static TaskRunner Create(CalculatorGraphConfig config, int callbackId = -1, NativePacketsCallback packetsCallback = null)
-    {
-      var bytes = config.ToByteArray();
-      UnsafeNativeMethods.mp_tasks_core_TaskRunner_Create__PKc_i_PF(bytes, bytes.Length, callbackId, packetsCallback, out var statusPtr, out var taskRunnerPtr).Assert();
+			AssertStatusOk(statusPtr);
+			return new TaskRunner(taskRunnerPtr);
+		}
 
-      AssertStatusOk(statusPtr);
-      return new TaskRunner(taskRunnerPtr);
-    }
+		public static TaskRunner Create(CalculatorGraphConfig config, int callbackId = -1,
+			NativePacketsCallback packetsCallback = null)
+		{
+			var bytes = config.ToByteArray();
+			UnsafeNativeMethods.mp_tasks_core_TaskRunner_Create__PKc_i_PF(bytes, bytes.Length, callbackId,
+				packetsCallback, out var statusPtr, out var taskRunnerPtr).Assert();
 
-    private TaskRunner(IntPtr ptr) : base(ptr) { }
+			AssertStatusOk(statusPtr);
+			return new TaskRunner(taskRunnerPtr);
+		}
 
-    protected override void DeleteMpPtr()
-    {
-      UnsafeNativeMethods.mp_tasks_core_TaskRunner__delete(ptr);
-    }
+		private TaskRunner(IntPtr ptr) : base(ptr)
+		{
+		}
 
-    public PacketMap Process(PacketMap inputs)
-    {
-      UnsafeNativeMethods.mp_tasks_core_TaskRunner__Process__Ppm(mpPtr, inputs.mpPtr, out var statusPtr, out var packetMapPtr).Assert();
-      inputs.Dispose(); // respect move semantics
+		protected override void DeleteMpPtr()
+		{
+			UnsafeNativeMethods.mp_tasks_core_TaskRunner__delete(ptr);
+		}
 
-      GC.KeepAlive(this);
-      AssertStatusOk(statusPtr);
-      return new PacketMap(packetMapPtr, true);
-    }
+		public PacketMap Process(PacketMap inputs)
+		{
+			UnsafeNativeMethods
+				.mp_tasks_core_TaskRunner__Process__Ppm(mpPtr, inputs.mpPtr, out var statusPtr, out var packetMapPtr)
+				.Assert();
+			inputs.Dispose(); // respect move semantics
 
-    public void Send(PacketMap inputs)
-    {
-      UnsafeNativeMethods.mp_tasks_core_TaskRunner__Send__Ppm(mpPtr, inputs.mpPtr, out var statusPtr).Assert();
-      inputs.Dispose(); // respect move semantics
+			GC.KeepAlive(this);
+			AssertStatusOk(statusPtr);
+			return new PacketMap(packetMapPtr, true);
+		}
 
-      GC.KeepAlive(this);
-      AssertStatusOk(statusPtr);
-    }
+		public void Send(PacketMap inputs)
+		{
+			UnsafeNativeMethods.mp_tasks_core_TaskRunner__Send__Ppm(mpPtr, inputs.mpPtr, out var statusPtr).Assert();
+			inputs.Dispose(); // respect move semantics
 
-    public void Close()
-    {
-      UnsafeNativeMethods.mp_tasks_core_TaskRunner__Close(mpPtr, out var statusPtr).Assert();
-      GC.KeepAlive(this);
+			GC.KeepAlive(this);
+			AssertStatusOk(statusPtr);
+		}
 
-      AssertStatusOk(statusPtr);
-    }
+		public void Close()
+		{
+			UnsafeNativeMethods.mp_tasks_core_TaskRunner__Close(mpPtr, out var statusPtr).Assert();
+			GC.KeepAlive(this);
 
-    public void Restart()
-    {
-      UnsafeNativeMethods.mp_tasks_core_TaskRunner__Restart(mpPtr, out var statusPtr).Assert();
-      GC.KeepAlive(this);
+			AssertStatusOk(statusPtr);
+		}
 
-      AssertStatusOk(statusPtr);
-    }
+		public void Restart()
+		{
+			UnsafeNativeMethods.mp_tasks_core_TaskRunner__Restart(mpPtr, out var statusPtr).Assert();
+			GC.KeepAlive(this);
 
-    public CalculatorGraphConfig GetGraphConfig(ExtensionRegistry extensionRegistry = null)
-    {
-      UnsafeNativeMethods.mp_tasks_core_TaskRunner__GetGraphConfig(mpPtr, out var serializedProto).Assert();
-      GC.KeepAlive(this);
+			AssertStatusOk(statusPtr);
+		}
 
-      var parser = extensionRegistry == null ? CalculatorGraphConfig.Parser : CalculatorGraphConfig.Parser.WithExtensionRegistry(extensionRegistry);
-      var config = serializedProto.Deserialize(parser);
-      serializedProto.Dispose();
+		public CalculatorGraphConfig GetGraphConfig(ExtensionRegistry extensionRegistry = null)
+		{
+			UnsafeNativeMethods.mp_tasks_core_TaskRunner__GetGraphConfig(mpPtr, out var serializedProto).Assert();
+			GC.KeepAlive(this);
 
-      return config;
-    }
-  }
+			var parser = extensionRegistry == null
+				? CalculatorGraphConfig.Parser
+				: CalculatorGraphConfig.Parser.WithExtensionRegistry(extensionRegistry);
+			var config = serializedProto.Deserialize(parser);
+			serializedProto.Dispose();
+
+			return config;
+		}
+	}
 }
