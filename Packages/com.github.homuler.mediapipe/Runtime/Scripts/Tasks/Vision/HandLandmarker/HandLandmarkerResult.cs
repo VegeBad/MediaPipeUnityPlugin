@@ -65,8 +65,7 @@ namespace Mediapipe.Tasks.Vision.HandLandmarker
 			destination = new HandLandmarkerResult(dstHandedness, dstHandLandmarks, dstHandWorldLandmarks);
 		}
 
-		public override string ToString()
-			=>
+		public override string ToString() =>
 				$"{{ \"handedness\": {Util.Format(handedness)}, \"handLandmarks\": {Util.Format(handLandmarks)}, \"handWorldLandmarks\": {Util.Format(handWorldLandmarks)} }}";
 	}
 }

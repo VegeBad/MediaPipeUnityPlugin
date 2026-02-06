@@ -11,7 +11,7 @@ namespace Mediapipe.Unity
 {
 	public class HandLandmarkerResultAnnotationController : AnnotationController<MultiHandLandmarkListAnnotation>
 	{
-		[SerializeField] private bool _visualizeZ = false;
+		[SerializeField] private bool visualizeZ = false;
 
 		private readonly object _currentTargetLock = new object();
 		private HandLandmarkerResult _currentTarget;
@@ -39,7 +39,7 @@ namespace Mediapipe.Unity
 			{
 				isStale = false;
 				annotation.SetHandedness(_currentTarget.handedness);
-				annotation.Draw(_currentTarget.handLandmarks, _visualizeZ);
+				annotation.Draw(_currentTarget.handLandmarks, visualizeZ);
 			}
 		}
 	}

@@ -4,6 +4,7 @@
 // license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
+using System;
 using System.Collections.Generic;
 using Unity.Mathematics;
 using UnityEngine;
@@ -23,6 +24,9 @@ namespace Mediapipe.Unity
 		[SerializeField] private float landmarkRadius = 15.0f;
 		[SerializeField] private Color connectionColor = Color.white;
 		[SerializeField, Range(0, 1)] private float connectionWidth = 1.0f;
+		
+		public delegate void FingerDistanceChangedHandler(HandLandmarkListAnnotation.Hand hand, float distance);
+		public event FingerDistanceChangedHandler OnFingerDistanceChanged;
 
 #if UNITY_EDITOR
 		private void OnValidate()
@@ -120,6 +124,7 @@ namespace Mediapipe.Unity
 			annotation.SetLandmarkRadius(landmarkRadius);
 			annotation.SetConnectionColor(connectionColor);
 			annotation.SetConnectionWidth(connectionWidth);
+			annotation.OnFingerDistanceChanged += (hand, distance) => OnFingerDistanceChanged?.Invoke(hand, distance);
 			return annotation;
 		}
 

@@ -6,8 +6,8 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/ProjectionMapping/Scenes/Scene_TestDisplay.unity
-    guid: 3c6f14dcb748f4442bd9630956e318e9
+    path: Assets/ProjectionMapping/Scenes/Scene_Grab&Drop.unity
+    guid: c4584913cb577c94e951f4abb28bcd1d
   - enabled: 1
     path: Assets/MediaPipeUnity/Samples/Scenes/Object Detection/Object Detection.unity
     guid: d3734ffcdd3a40779bdd8de2c55bee2f

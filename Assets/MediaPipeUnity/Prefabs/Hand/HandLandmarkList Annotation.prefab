@@ -46,10 +46,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: febd88b13c7a8e91b855c9dd35dd65d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  landmarkListAnnotation: {fileID: 17314624880992431}
+  pointListAnnotation: {fileID: 17314624880992431}
   connectionListAnnotation: {fileID: 4860466422646548000}
   leftLandmarkColor: {r: 0, g: 1, b: 0, a: 1}
   rightLandmarkColor: {r: 0, g: 1, b: 0, a: 1}
+  handedness: 255
 --- !u!1001 &3919333542530190328
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -244,6 +245,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 9215842904284589815, guid: e260d2f5fb90a790385fcb2d815b23a6,
+        type: 3}
+      propertyPath: hand
+      value: 
+      objectReference: {fileID: 7426451068229116525}
     - target: {fileID: 9215842904284589815, guid: e260d2f5fb90a790385fcb2d815b23a6,
         type: 3}
       propertyPath: color.g

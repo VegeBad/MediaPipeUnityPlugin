@@ -1,6 +1,7 @@
 Script naming scheme:
 
 (Prefix) Mono- 		    : Monobehaviour class that is not part of Baker<>, static or singleton
+(Prefix) UI- 		    : Monobehaviour class that is a UI widget
 (Suffix) -Bridge	    : Monobehaviour class that is not a singleton, doesn't have Baker<> but serves as a bridge between Monobehaviour and ECS
 (Suffix) -Manager	    : Monobehaviour class that is a "don't destroy on load" singleton
 (Suffix) -Controller    : Monobehaviour class that is a local scene singleton

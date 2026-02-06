@@ -4,6 +4,7 @@
 // license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using mptcc = Mediapipe.Tasks.Components.Containers;
@@ -17,15 +18,19 @@ namespace Mediapipe.Unity
 
 	public sealed class HandLandmarkListAnnotation : HierarchicalAnnotation
 	{
-		[SerializeField] private PointListAnnotation landmarkListAnnotation;
+		[SerializeField] private PointListAnnotation pointListAnnotation;
 		[SerializeField] private ConnectionListAnnotation connectionListAnnotation;
 		[SerializeField] private Color leftLandmarkColor = Color.green;
 		[SerializeField] private Color rightLandmarkColor = Color.green;
 
+		public Hand handedness = Hand.None;
+		public Action<Hand, float> OnFingerDistanceChanged;
+		
 		public enum Hand : byte
 		{
 			Left,
 			Right,
+			None = byte.MaxValue, 
 		}
 
 		private const int LandmarkCount = 21;
@@ -59,7 +64,7 @@ namespace Mediapipe.Unity
 		{
 			set
 			{
-				landmarkListAnnotation.isMirrored = value;
+				pointListAnnotation.isMirrored = value;
 				connectionListAnnotation.isMirrored = value;
 				base.isMirrored = value;
 			}
@@ -69,18 +74,20 @@ namespace Mediapipe.Unity
 		{
 			set
 			{
-				landmarkListAnnotation.rotationAngle = value;
+				pointListAnnotation.rotationAngle = value;
 				connectionListAnnotation.rotationAngle = value;
 				base.rotationAngle = value;
 			}
 		}
 
-		public PointAnnotation this[int index] => landmarkListAnnotation[index];
+		public PointAnnotation this[int index] => pointListAnnotation[index];
 
 		private void Start()
 		{
-			landmarkListAnnotation.Fill(LandmarkCount);
-			connectionListAnnotation.Fill(_connections, landmarkListAnnotation);
+			pointListAnnotation.Fill(LandmarkCount);
+			connectionListAnnotation.Fill(_connections, pointListAnnotation);
+			
+			pointListAnnotation.hand = this;
 		}
 
 		public void SetLeftLandmarkColor(Color leftColor) => leftLandmarkColor = leftColor;
@@ -89,7 +96,7 @@ namespace Mediapipe.Unity
 
 		public void SetLandmarkRadius(float landmarkRadius)
 		{
-			landmarkListAnnotation.SetRadius(landmarkRadius);
+			pointListAnnotation.SetRadius(landmarkRadius);
 		}
 
 		public void SetConnectionColor(Color connectionColor)
@@ -102,15 +109,18 @@ namespace Mediapipe.Unity
 			connectionListAnnotation.SetLineWidth(connectionWidth);
 		}
 
-		public void SetHandedness(Hand handedness)
+		// For some reason, left & right results are inverted
+		public void SetHandedness(Hand handed)
 		{
-			switch (handedness)
+			switch (handed)
 			{
 				case Hand.Left:
-					landmarkListAnnotation.SetColor(leftLandmarkColor);
+					handedness = Hand.Right;
+					pointListAnnotation.SetColor(rightLandmarkColor);
 					break;
 				case Hand.Right:
-					landmarkListAnnotation.SetColor(rightLandmarkColor);
+					handedness = Hand.Left;
+					pointListAnnotation.SetColor(leftLandmarkColor);
 					break;
 			}
 		}
@@ -154,7 +164,7 @@ namespace Mediapipe.Unity
 		public void Draw(IReadOnlyList<NormalizedLandmark> target, bool visualizeZ = false)
 		{
 			if (!ActivateFor(target)) return;
-			landmarkListAnnotation.Draw(target, visualizeZ);
+			pointListAnnotation.Draw(target, visualizeZ);
 			// Draw explicitly because connection annotation's targets remain the same.
 			connectionListAnnotation.Redraw();
 		}
@@ -167,7 +177,7 @@ namespace Mediapipe.Unity
 		public void Draw(IReadOnlyList<mptcc.NormalizedLandmark> target, bool visualizeZ = false)
 		{
 			if (!ActivateFor(target)) return;
-			landmarkListAnnotation.Draw(target, visualizeZ);
+			pointListAnnotation.Draw(target, visualizeZ);
 			// Draw explicitly because connection annotation's targets remain the same.
 			connectionListAnnotation.Redraw();
 		}

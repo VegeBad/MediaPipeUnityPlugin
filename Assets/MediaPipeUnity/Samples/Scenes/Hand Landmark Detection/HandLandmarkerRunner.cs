@@ -17,7 +17,7 @@ namespace Mediapipe.Unity.Sample.HandLandmarkDetection
 
 		private Experimental.TextureFramePool _textureFramePool;
 
-		public readonly HandLandmarkDetectionConfig config = new();
+		public readonly HandLandmarkDetectionConfig Config = new();
 
 		public override void Stop()
 		{
@@ -29,18 +29,18 @@ namespace Mediapipe.Unity.Sample.HandLandmarkDetection
 		protected override IEnumerator Run()
 		{
 #if UNITY_EDITOR
-			Debug.Log($"Delegate = {config.Delegate}");
-			Debug.Log($"Image Read Mode = {config.ImageReadMode}");
-			Debug.Log($"Running Mode = {config.RunningMode}");
-			Debug.Log($"NumHands = {config.NumHands}");
-			Debug.Log($"MinHandDetectionConfidence = {config.MinHandDetectionConfidence}");
-			Debug.Log($"MinHandPresenceConfidence = {config.MinHandPresenceConfidence}");
-			Debug.Log($"MinTrackingConfidence = {config.MinTrackingConfidence}");
+			Debug.Log($"Delegate = {Config.Delegate}");
+			Debug.Log($"Image Read Mode = {Config.ImageReadMode}");
+			Debug.Log($"Running Mode = {Config.RunningMode}");
+			Debug.Log($"NumHands = {Config.NumHands}");
+			Debug.Log($"MinHandDetectionConfidence = {Config.MinHandDetectionConfidence}");
+			Debug.Log($"MinHandPresenceConfidence = {Config.MinHandPresenceConfidence}");
+			Debug.Log($"MinTrackingConfidence = {Config.MinTrackingConfidence}");
 #endif
-			yield return AssetLoader.PrepareAssetAsync(config.ModelPath);
+			yield return AssetLoader.PrepareAssetAsync(Config.ModelPath);
 
-			var options = config.GetHandLandmarkerOptions(
-				config.RunningMode == Tasks.Vision.Core.RunningMode.LIVE_STREAM ? OnHandLandmarkDetectionOutput : null);
+			var options = Config.GetHandLandmarkerOptions(
+				Config.RunningMode == Tasks.Vision.Core.RunningMode.LIVE_STREAM ? OnHandLandmarkDetectionOutput : null);
 			TaskApi = HandLandmarker.CreateFromOptions(options, GpuManager.GpuResources);
 			var imageSource = ImageSourceProvider.ImageSource;
 
@@ -93,7 +93,7 @@ namespace Mediapipe.Unity.Sample.HandLandmarkDetection
 
 				// Build the input Image
 				Image image;
-				switch (config.ImageReadMode)
+				switch (Config.ImageReadMode)
 				{
 					case ImageReadMode.GPU:
 						if (!canUseGpuImage)
@@ -135,14 +135,8 @@ namespace Mediapipe.Unity.Sample.HandLandmarkDetection
 				switch (TaskApi.RunningMode)
 				{
 					case Tasks.Vision.Core.RunningMode.IMAGE:
-						if (TaskApi.TryDetect(image, imageProcessingOptions, ref result))
-						{
-							handLandmarkerResultAnnotationController.DrawNow(result);
-						}
-						else
-						{
-							handLandmarkerResultAnnotationController.DrawNow(default);
-						}
+						handLandmarkerResultAnnotationController.DrawNow(
+							TaskApi.TryDetect(image, imageProcessingOptions, ref result) ? result : default);
 
 						break;
 					case Tasks.Vision.Core.RunningMode.VIDEO:

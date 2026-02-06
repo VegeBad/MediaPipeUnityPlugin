@@ -25,7 +25,7 @@ namespace Mediapipe.Unity.Sample.HandLandmarkDetection.UI
 
 		private void Start()
 		{
-			_config = GameObject.Find("Solution").GetComponent<HandLandmarkerRunner>().config;
+			_config = GameObject.Find("Solution").GetComponent<HandLandmarkerRunner>().Config;
 			InitializeContents();
 		}
 
