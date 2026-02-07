@@ -48,7 +48,7 @@ namespace Mediapipe.Unity
 
 		public void ReadSync(Experimental.TextureFrame textureFrame)
 		{
-			if (!(texture is Texture2D))
+			if (texture is not Texture2D)
 			{
 				texture = new Texture2D(_imageSource.textureWidth, _imageSource.textureHeight, TextureFormat.RGBA32,
 					false);

@@ -1,4 +1,5 @@
 using EugeneC.Singleton;
+using EugeneC.Utilities;
 using UnityEngine;
 
 namespace ProjectionMapping
@@ -8,15 +9,7 @@ namespace ProjectionMapping
 	{
 		private void Start()
 		{
-			ActivateDisplay();
-		}
-
-		private static void ActivateDisplay()
-		{
-			for (var i = 1; i < Display.displays.Length; i++)
-			{
-				Display.displays[i].Activate();
-			}
+			HelperCollection.ActivateDisplay();
 		}
 	}
 }

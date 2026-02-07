@@ -40,11 +40,7 @@ namespace Mediapipe.Unity
 			get => _webCamTexture;
 			set
 			{
-				if (_webCamTexture != null)
-				{
-					_webCamTexture.Stop();
-				}
-
+				_webCamTexture?.Stop();
 				_webCamTexture = value;
 			}
 		}
@@ -234,11 +230,7 @@ namespace Mediapipe.Unity
 
 		public override void Stop()
 		{
-			if (webCamTexture != null)
-			{
-				webCamTexture.Stop();
-			}
-
+			webCamTexture?.Stop();
 			webCamTexture = null;
 		}
 

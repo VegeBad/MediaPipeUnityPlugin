@@ -74,7 +74,6 @@ namespace Mediapipe.Unity
 				SetActive(false);
 				return false;
 			}
-
 			SetActive(true);
 			return true;
 		}
@@ -89,15 +88,6 @@ namespace Mediapipe.Unity
 			annotation.isMirrored = isMirrored;
 			annotation.rotationAngle = rotationAngle;
 			return annotation;
-		}
-
-		protected TH InstantiateChild<TH>(string obName = "Game Object")
-			where TH : HierarchicalAnnotation
-		{
-			var gameOb = new GameObject(obName);
-			gameOb.transform.SetParent(transform);
-
-			return gameOb.AddComponent<TH>();
 		}
 	}
 }

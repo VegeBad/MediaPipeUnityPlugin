@@ -662,7 +662,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1851758046}
   m_Layer: 0
-  m_Name: ==========< Dyanamic >====================
+  m_Name: ==========< UI & Dyanamic >====================
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
