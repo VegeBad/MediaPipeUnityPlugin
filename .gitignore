@@ -16,13 +16,13 @@
 *.sln
 *.unitypackage
 
-*.aar
-*.bc
-*.dll
-*.dylib
-*.so
-**/*.framework/*
-!**/*.framework/*.meta
+# *.aar
+# *.bc
+# *.dll
+# *.dylib
+# *.so
+# **/*.framework/*
+# !**/*.framework/*.meta
 
 bazel-*
 
@@ -30,5 +30,5 @@ Assets/StreamingAssets*
 
 # Packages/com.github.homuler.mediapipe/PackageResources/MediaPipe/*
 # !Packages/com.github.homuler.mediapipe/PackageResources/MediaPipe/*.meta
-Packages/com.github.homuler.mediapipe/PackageResources/MediaPipe/object_detection_3d.bytes.meta
+# Packages/com.github.homuler.mediapipe/PackageResources/MediaPipe/object_detection_3d.bytes.meta
 # Packages/com.github.homuler.mediapipe/Runtime/Plugins/Protobuf/*.dll
