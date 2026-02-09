@@ -15,6 +15,7 @@ using Mediapipe.Unity;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.TestTools;
+using RunningMode = Mediapipe.Tasks.Vision.Core.RunningMode;
 using Stopwatch = System.Diagnostics.Stopwatch;
 
 namespace Mediapipe.Tests.Tasks.Vision

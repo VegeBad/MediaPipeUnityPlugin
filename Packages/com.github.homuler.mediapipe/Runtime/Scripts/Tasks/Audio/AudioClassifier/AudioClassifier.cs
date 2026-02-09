@@ -36,8 +36,8 @@ namespace Mediapipe.Tasks.Audio.AudioClassifier
 
 		private AudioClassifier(
 			CalculatorGraphConfig graphConfig,
-			Core.RunningMode runningMode,
-			Tasks.Core.TaskRunner.PacketsCallback packetCallback) : base(graphConfig, runningMode, packetCallback)
+			Core.AudioRunningMode audioRunningMode,
+			Tasks.Core.TaskRunner.PacketsCallback packetCallback) : base(graphConfig, audioRunningMode, packetCallback)
 		{
 			_packetCallback = packetCallback;
 		}
@@ -54,7 +54,7 @@ namespace Mediapipe.Tasks.Audio.AudioClassifier
 		public static AudioClassifier CreateFromModelPath(string modelPath)
 		{
 			var baseOptions = new Tasks.Core.BaseOptions(modelAssetPath: modelPath);
-			var options = new AudioClassifierOptions(baseOptions, runningMode: Core.RunningMode.AUDIO_CLIPS);
+			var options = new AudioClassifierOptions(baseOptions, audioRunningMode: Core.AudioRunningMode.AUDIO_CLIPS);
 			return CreateFromOptions(options);
 		}
 
@@ -82,8 +82,8 @@ namespace Mediapipe.Tasks.Audio.AudioClassifier
 				taskOptions: options);
 
 			return new AudioClassifier(
-				taskInfo.GenerateGraphConfig(options.runningMode == Core.RunningMode.AUDIO_STREAM),
-				options.runningMode,
+				taskInfo.GenerateGraphConfig(options.AudioRunningMode == Core.AudioRunningMode.AUDIO_STREAM),
+				options.AudioRunningMode,
 				BuildPacketsCallback(options));
 		}
 

@@ -14,7 +14,7 @@ namespace Mediapipe.Tasks.Audio.Core
 	public class BaseAudioTaskApi : IDisposable
 	{
 		private readonly Tasks.Core.TaskRunner _taskRunner;
-		public RunningMode runningMode { get; }
+		public AudioRunningMode AudioRunningMode { get; }
 		private bool _isClosed = false;
 
 		/// <summary>
@@ -25,10 +25,10 @@ namespace Mediapipe.Tasks.Audio.Core
 		/// </exception>
 		protected BaseAudioTaskApi(
 			CalculatorGraphConfig graphConfig,
-			RunningMode runningMode,
+			AudioRunningMode audioRunningMode,
 			Tasks.Core.TaskRunner.PacketsCallback packetsCallback)
 		{
-			if (runningMode == RunningMode.AUDIO_STREAM)
+			if (audioRunningMode == AudioRunningMode.AUDIO_STREAM)
 			{
 				if (packetsCallback == null)
 				{
@@ -44,7 +44,7 @@ namespace Mediapipe.Tasks.Audio.Core
 
 			var (callbackId, nativePacketsCallback) = Tasks.Core.PacketsCallbackTable.Add(packetsCallback);
 			_taskRunner = Tasks.Core.TaskRunner.Create(graphConfig, callbackId, nativePacketsCallback);
-			this.runningMode = runningMode;
+			this.AudioRunningMode = audioRunningMode;
 		}
 
 		/// <summary>
@@ -57,10 +57,10 @@ namespace Mediapipe.Tasks.Audio.Core
 		/// </exception>
 		protected PacketMap ProcessAudioClip(PacketMap inputs)
 		{
-			if (runningMode != RunningMode.AUDIO_CLIPS)
+			if (AudioRunningMode != AudioRunningMode.AUDIO_CLIPS)
 			{
 				throw new InvalidOperationException(
-					$"Task is not initialized with the audio clips mode. Current running mode: {runningMode}");
+					$"Task is not initialized with the audio clips mode. Current running mode: {AudioRunningMode}");
 			}
 
 			return _taskRunner.Process(inputs);
@@ -76,10 +76,10 @@ namespace Mediapipe.Tasks.Audio.Core
 		/// </exception>
 		protected void SetSampleRate(string sampleRateStreamName, double sampleRate)
 		{
-			if (runningMode != RunningMode.AUDIO_STREAM)
+			if (AudioRunningMode != AudioRunningMode.AUDIO_STREAM)
 			{
 				throw new InvalidOperationException(
-					$"Task is not initialized with the audio stream mode. Current running mode: {runningMode}");
+					$"Task is not initialized with the audio stream mode. Current running mode: {AudioRunningMode}");
 			}
 
 			using var timestamp = Timestamp.PreStream();
@@ -99,10 +99,10 @@ namespace Mediapipe.Tasks.Audio.Core
 		/// </exception>
 		protected void SendAudioStreamData(PacketMap inputs)
 		{
-			if (runningMode != RunningMode.AUDIO_STREAM)
+			if (AudioRunningMode != AudioRunningMode.AUDIO_STREAM)
 			{
 				throw new InvalidOperationException(
-					$"Task is not initialized with the audio stream mode. Current running mode: {runningMode}");
+					$"Task is not initialized with the audio stream mode. Current running mode: {AudioRunningMode}");
 			}
 
 			_taskRunner.Send(inputs);

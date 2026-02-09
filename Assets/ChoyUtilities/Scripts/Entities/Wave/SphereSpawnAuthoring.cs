@@ -3,7 +3,6 @@ using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 namespace EugeneC.ECS
 {
@@ -51,16 +50,12 @@ namespace EugeneC.ECS
 		public float Height;
 		public float Speed;
 	}
-
-#if !UNITY_WEBGL
+	
 	[BurstCompile]
-#endif
 	[UpdateInGroup(typeof(Eu_InitializationSystemGroup), OrderFirst = true)]
 	public partial struct SpawnInSphereISystem : ISystem
 	{
-#if !UNITY_WEBGL
 		[BurstCompile]
-#endif
 		public void OnUpdate(ref SystemState state)
 		{
 			var ecb = new EntityCommandBuffer(state.WorldUpdateAllocator);
@@ -71,12 +66,19 @@ namespace EugeneC.ECS
 			{
 				using var instances = em.Instantiate(sphere.ValueRO.Prefab, sphere.ValueRO.Amount,
 					state.WorldUpdateAllocator);
+
+				var rng = new Unity.Mathematics.Random((uint)math.max(1, entity.Index + SystemAPI.Time.ElapsedTime));
+
 				for (var i = 0; i < sphere.ValueRO.Amount; i++)
 				{
 					var lt = em.GetComponentData<LocalTransform>(instances[i]);
-					var newPos = ltw.ValueRO.Position + (float3)Random.insideUnitSphere * sphere.ValueRO.Radius;
+					var dir = rng.NextFloat3Direction();
+					var dist = sphere.ValueRO.Radius * math.pow(rng.NextFloat(), 1f / 3f);
+					var newPos = ltw.ValueRO.Position + dir * dist;
+
 					lt.Position = newPos;
 					em.SetComponentData(instances[i], lt);
+
 					ecb.AddComponent(instances[i], new WaveMoveIData
 					{
 						YOffset = newPos.y,

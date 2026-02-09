@@ -46,7 +46,7 @@ namespace Mediapipe.Tasks.Audio.AudioClassifier
 		///     </item>
 		///   </list>
 		/// </summary>
-		public Core.RunningMode runningMode { get; }
+		public Core.AudioRunningMode AudioRunningMode { get; }
 
 		/// <summary>
 		///   The locale to use for display names specified through the TFLite Model Metadata.
@@ -85,7 +85,7 @@ namespace Mediapipe.Tasks.Audio.AudioClassifier
 
 		public AudioClassifierOptions(
 			Tasks.Core.BaseOptions baseOptions,
-			Core.RunningMode runningMode = Core.RunningMode.AUDIO_CLIPS,
+			Core.AudioRunningMode audioRunningMode = Core.AudioRunningMode.AUDIO_CLIPS,
 			string displayNamesLocale = null,
 			int? maxResults = null,
 			float? scoreThreshold = null,
@@ -94,7 +94,7 @@ namespace Mediapipe.Tasks.Audio.AudioClassifier
 			ResultCallback resultCallback = null)
 		{
 			this.baseOptions = baseOptions;
-			this.runningMode = runningMode;
+			this.AudioRunningMode = audioRunningMode;
 			this.displayNamesLocale = displayNamesLocale;
 			this.maxResults = maxResults;
 			this.scoreThreshold = scoreThreshold;
@@ -106,7 +106,7 @@ namespace Mediapipe.Tasks.Audio.AudioClassifier
 		internal Proto.AudioClassifierGraphOptions ToProto()
 		{
 			var baseOptionsProto = baseOptions.ToProto();
-			baseOptionsProto.UseStreamMode = runningMode != Core.RunningMode.AUDIO_CLIPS;
+			baseOptionsProto.UseStreamMode = AudioRunningMode != Core.AudioRunningMode.AUDIO_CLIPS;
 
 			var classifierOptions = new Components.Processors.Proto.ClassifierOptions();
 			if (displayNamesLocale != null)

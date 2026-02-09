@@ -108,7 +108,7 @@ namespace Mediapipe.Tests.Tasks.Audio
 		{
 			var options = new AudioClassifierOptions(
 				new BaseOptions(BaseOptions.Delegate.CPU, modelAssetBuffer: _audioClassifierModel.Value.bytes),
-				runningMode: RunningMode.AUDIO_CLIPS);
+				audioRunningMode: AudioRunningMode.AUDIO_CLIPS);
 
 			using (var audioClassifier = AudioClassifier.CreateFromOptions(options))
 			{
@@ -144,7 +144,7 @@ namespace Mediapipe.Tests.Tasks.Audio
 		{
 			var options = new AudioClassifierOptions(
 				new BaseOptions(BaseOptions.Delegate.CPU, modelAssetBuffer: _audioClassifierModel.Value.bytes),
-				runningMode: RunningMode.AUDIO_CLIPS,
+				audioRunningMode: AudioRunningMode.AUDIO_CLIPS,
 				maxResults: 1);
 
 			using (var audioClassifier = AudioClassifier.CreateFromOptions(options))
@@ -167,7 +167,7 @@ namespace Mediapipe.Tests.Tasks.Audio
 			var scoreThresold = 0.3f;
 			var options = new AudioClassifierOptions(
 				new BaseOptions(BaseOptions.Delegate.CPU, modelAssetBuffer: _audioClassifierModel.Value.bytes),
-				runningMode: RunningMode.AUDIO_CLIPS,
+				audioRunningMode: AudioRunningMode.AUDIO_CLIPS,
 				scoreThreshold: scoreThresold);
 
 			using (var audioClassifier = AudioClassifier.CreateFromOptions(options))
@@ -192,7 +192,7 @@ namespace Mediapipe.Tests.Tasks.Audio
 		{
 			var options = new AudioClassifierOptions(
 				new BaseOptions(BaseOptions.Delegate.CPU, modelAssetBuffer: _audioClassifierModel.Value.bytes),
-				runningMode: RunningMode.AUDIO_CLIPS,
+				audioRunningMode: AudioRunningMode.AUDIO_CLIPS,
 				categoryAllowList: new List<string> { "Sound effect" });
 
 			using (var audioClassifier = AudioClassifier.CreateFromOptions(options))
@@ -217,7 +217,7 @@ namespace Mediapipe.Tests.Tasks.Audio
 		{
 			var options = new AudioClassifierOptions(
 				new BaseOptions(BaseOptions.Delegate.CPU, modelAssetBuffer: _audioClassifierModel.Value.bytes),
-				runningMode: RunningMode.AUDIO_CLIPS,
+				audioRunningMode: AudioRunningMode.AUDIO_CLIPS,
 				categoryDenyList: new List<string> { "Silence" });
 
 			using (var audioClassifier = AudioClassifier.CreateFromOptions(options))
@@ -239,7 +239,7 @@ namespace Mediapipe.Tests.Tasks.Audio
 		{
 			var options = new AudioClassifierOptions(
 				new BaseOptions(BaseOptions.Delegate.CPU, modelAssetBuffer: _audioClassifierModel.Value.bytes),
-				runningMode: RunningMode.AUDIO_CLIPS);
+				audioRunningMode: AudioRunningMode.AUDIO_CLIPS);
 
 			using (var audioClassifier = AudioClassifier.CreateFromOptions(options))
 			{
@@ -263,7 +263,7 @@ namespace Mediapipe.Tests.Tasks.Audio
 		{
 			var options = new AudioClassifierOptions(
 				new BaseOptions(BaseOptions.Delegate.CPU, modelAssetBuffer: _audioClassifierModel.Value.bytes),
-				runningMode: RunningMode.AUDIO_CLIPS,
+				audioRunningMode: AudioRunningMode.AUDIO_CLIPS,
 				maxResults: 5);
 
 			using (var audioClassifier = AudioClassifier.CreateFromOptions(options))
@@ -304,7 +304,7 @@ namespace Mediapipe.Tests.Tasks.Audio
 
 			var options = new AudioClassifierOptions(new BaseOptions(BaseOptions.Delegate.CPU,
 					modelAssetBuffer: _audioClassifierModel.Value.bytes),
-				runningMode: RunningMode.AUDIO_STREAM,
+				audioRunningMode: AudioRunningMode.AUDIO_CLIPS,
 				resultCallback: callback);
 
 			using (var audioClassifier = AudioClassifier.CreateFromOptions(options))

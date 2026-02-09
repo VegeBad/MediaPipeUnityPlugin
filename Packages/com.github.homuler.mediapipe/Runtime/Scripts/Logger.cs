@@ -20,7 +20,7 @@ namespace Mediapipe
 
 	public static class Logger
 	{
-		public enum LogLevel : int
+		public enum LogLevel : byte
 		{
 			Fatal,
 			Error,
