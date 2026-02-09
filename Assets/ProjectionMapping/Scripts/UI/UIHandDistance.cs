@@ -16,14 +16,14 @@ namespace ProjectionMapping
 	        multiHand.OnFingerDistanceChanged += ShowFingerDistanceChanged;
         }
 
-        private void ShowFingerDistanceChanged(HandLandmarkListAnnotation.Hand arg1, float arg2)
+        private void ShowFingerDistanceChanged(Hand arg1, float arg2)
         {
 	        switch (arg1)
 	        {
-		        case HandLandmarkListAnnotation.Hand.Left:
+		        case Hand.Left:
 			        leftText.text = $"Left: {arg2:F2}";
 			        break;
-		        case HandLandmarkListAnnotation.Hand.Right:
+		        case Hand.Right:
 			        rightText.text = $"Right: {arg2:F2}";
 			        break;
 	        }

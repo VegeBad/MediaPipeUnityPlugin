@@ -25,7 +25,7 @@ namespace Mediapipe.Unity
 		[SerializeField] private Color connectionColor = Color.white;
 		[SerializeField, Range(0, 1)] private float connectionWidth = 1.0f;
 		
-		public delegate void FingerDistanceChangedHandler(HandLandmarkListAnnotation.Hand hand, float distance);
+		public delegate void FingerDistanceChangedHandler(Hand hand, float distance);
 		public event FingerDistanceChangedHandler OnFingerDistanceChanged;
 
 #if UNITY_EDITOR

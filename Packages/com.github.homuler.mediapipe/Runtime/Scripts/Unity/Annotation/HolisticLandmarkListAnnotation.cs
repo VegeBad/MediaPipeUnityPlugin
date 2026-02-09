@@ -45,8 +45,8 @@ namespace Mediapipe.Unity
 
 		private void Start()
 		{
-			_leftHandLandmarkListAnnotation.SetHandedness(HandLandmarkListAnnotation.Hand.Left);
-			_rightHandLandmarkListAnnotation.SetHandedness(HandLandmarkListAnnotation.Hand.Right);
+			_leftHandLandmarkListAnnotation.SetHandedness(Hand.Left);
+			_rightHandLandmarkListAnnotation.SetHandedness(Hand.Right);
 			_connectionListAnnotation.Fill(2); // left/right wrist joint
 		}
 

@@ -1,24 +1,26 @@
 using System;
 using System.Collections;
 using System.Diagnostics;
+using EugeneC.Singleton;
 using Mediapipe.Tasks.Vision.Core;
 using Mediapipe.Unity;
 using Mediapipe.Unity.Sample;
 using Unity.Mathematics;
 using UnityEngine;
-using Screen = UnityEngine.Screen;
+using Screen = Mediapipe.Unity.Screen;
 
 namespace ProjectionMapping
 {
 	[DisallowMultipleComponent]
-    public abstract class MappingSolution<T> : MonoBehaviour
+    public abstract class MappingSolution<T, TU> : GenericSingleton<TU>
 		where T : BaseVisionTaskApi
+		where TU : MonoBehaviour
     {
 	    [SerializeField] private Bootstrap prefab;
 	    [SerializeField] protected Screen screen;
 	    
 	    protected Bootstrap Bootstrap;
-	    private bool _isPaused;
+	    protected bool IsPaused;
 	    private Coroutine _coroutine;
 	    private readonly Stopwatch _stopwatch = new();
 
@@ -26,6 +28,7 @@ namespace ProjectionMapping
 
 	    protected virtual IEnumerator Start()
 	    {
+		    KeepSingleton(true);
 		    Bootstrap = Instantiate(prefab, transform);
 		    yield return new WaitUntil(() => Bootstrap.IsFinished);
 		    
@@ -38,7 +41,7 @@ namespace ProjectionMapping
 	    public virtual void Play()
 	    {
 		    if (_coroutine != null) Stop();
-		    _isPaused = false;
+		    IsPaused = false;
 		    _stopwatch.Restart();
 		    _coroutine = StartCoroutine(Run());
 	    }
@@ -50,7 +53,7 @@ namespace ProjectionMapping
 	    /// </summary>
 	    public virtual void Pause()
 	    {
-		    _isPaused = true;
+		    IsPaused = true;
 		    ImageSourceProvider.ImageSource.Pause();
 	    }
 
@@ -60,7 +63,7 @@ namespace ProjectionMapping
 	    /// </summary>
 	    public virtual void Resume()
 	    {
-		    _isPaused = false;
+		    IsPaused = false;
 		    StartCoroutine(ImageSourceProvider.ImageSource.Resume());
 	    }
 
@@ -69,7 +72,7 @@ namespace ProjectionMapping
 	    /// </summary>
 	    public virtual void Stop()
 	    {
-		    _isPaused = true;
+		    IsPaused = true;
 		    _stopwatch.Stop();
 		    StopCoroutine(_coroutine);
 		    ImageSourceProvider.ImageSource.Stop();
@@ -80,9 +83,9 @@ namespace ProjectionMapping
 	    protected long GetCurrentTimestampMilliSec() =>
 		    _stopwatch.IsRunning ? _stopwatch.ElapsedTicks / TimeSpan.TicksPerMillisecond : -1;
 	    
-	    protected static void SetupAnnotationController<TU>(AnnotationController<TU> annotationController,
+	    protected static void SetupAnnotationController<TA>(AnnotationController<TA> annotationController,
 		    ImageSource imageSource, bool expectedToBeMirrored = false)
-		    where TU : HierarchicalAnnotation
+		    where TA : HierarchicalAnnotation
 	    {
 		    annotationController.isMirrored = expectedToBeMirrored;
 		    annotationController.imageSize = new int2(imageSource.textureWidth, imageSource.textureHeight);

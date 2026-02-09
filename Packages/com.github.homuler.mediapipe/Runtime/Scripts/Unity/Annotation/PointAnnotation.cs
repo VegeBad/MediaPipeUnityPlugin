@@ -78,7 +78,7 @@ namespace Mediapipe.Unity
 			transform.localPosition = position;
 		}
 
-		public void Draw(in mptcc.NormalizedLandmark target, bool visualizeZ = true)
+		public void Draw(mptcc.NormalizedLandmark target, bool visualizeZ = true)
 		{
 			if (!ActivateFor(target)) return;
 			var position = GetScreenRect().GetPoint(in target, rotationAngle, isMirrored);

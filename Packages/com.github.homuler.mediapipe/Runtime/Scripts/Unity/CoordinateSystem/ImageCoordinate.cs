@@ -148,11 +148,11 @@ namespace Mediapipe.Unity.CoordinateSystem
 			var isInverted = IsInverted(imageRotation);
 			var (nx, ny) = isInverted ? (normalizedY, normalizedX) : (normalizedX, normalizedY);
 			var x = IsXReversed(imageRotation, isMirrored)
-				? Mathf.LerpUnclamped(xMax, xMin, nx)
+				? math.lerp(xMax, xMin, nx)
 				: Mathf.LerpUnclamped(xMin, xMax, nx);
 			var y = IsYReversed(imageRotation, isMirrored)
-				? Mathf.LerpUnclamped(yMax, yMin, ny)
-				: Mathf.LerpUnclamped(yMin, yMax, ny);
+				? math.lerp(yMax, yMin, ny)
+				: math.lerp(yMin, yMax, ny);
 			var z = zScale * normalizedZ;
 			return new float3(x, y, z);
 		}
@@ -722,7 +722,6 @@ namespace Mediapipe.Unity.CoordinateSystem
 		/// <summary>
 		///   Returns <c>true</c> if <paramref name="rotationAngle" /> is <see cref="RotationAngle.Rotation90" /> or <see cref="RotationAngle.Rotation270" />.
 		/// </summary>
-		public static bool IsInverted(RotationAngle rotationAngle) => rotationAngle == RotationAngle.Rotation90 ||
-		                                                              rotationAngle == RotationAngle.Rotation270;
+		public static bool IsInverted(RotationAngle rotationAngle) => rotationAngle is RotationAngle.Rotation90 or RotationAngle.Rotation270;
 	}
 }

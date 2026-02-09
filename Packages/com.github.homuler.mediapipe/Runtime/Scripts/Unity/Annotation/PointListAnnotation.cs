@@ -99,7 +99,7 @@ namespace Mediapipe.Unity
 		{
 			if (ActivateFor(targets))
 			{
-				CallActionForAll(targets, (annotation, target) => annotation?.Draw(in target, visualizeZ));
+				CallActionForAll(targets, (annotation, target) => annotation?.Draw(target, visualizeZ));
 			}
 		}
 

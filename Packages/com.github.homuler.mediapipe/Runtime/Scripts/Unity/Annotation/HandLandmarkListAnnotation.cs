@@ -15,27 +15,17 @@ namespace Mediapipe.Unity
 	using Color = UnityEngine.Color;
 
 #pragma warning restore IDE0065
-
-	public sealed class HandLandmarkListAnnotation : HierarchicalAnnotation
+	
+	public enum Hand : byte
 	{
-		[SerializeField] private PointListAnnotation pointListAnnotation;
-		[SerializeField] private ConnectionListAnnotation connectionListAnnotation;
-		[SerializeField] private Color leftLandmarkColor = Color.green;
-		[SerializeField] private Color rightLandmarkColor = Color.green;
+		Left,
+		Right,
+		None = byte.MaxValue, 
+	}
 
-		public Hand handedness = Hand.None;
-		public Action<Hand, float> OnFingerDistanceChanged;
-		
-		public enum Hand : byte
-		{
-			Left,
-			Right,
-			None = byte.MaxValue, 
-		}
-
-		private const int LandmarkCount = 21;
-
-		private readonly List<(int, int)> _connections = new List<(int, int)>
+	public static class HandLandmarkCollection
+	{
+		public static readonly IReadOnlyList<(int, int)> Connections = new List<(int, int)>
 		{
 			(0, 1),
 			(1, 2),
@@ -59,6 +49,19 @@ namespace Mediapipe.Unity
 			(18, 19),
 			(19, 20),
 		};
+		
+		public const int LandmarkCount = 21;
+	}
+
+	public sealed class HandLandmarkListAnnotation : HierarchicalAnnotation
+	{
+		[SerializeField] private PointListAnnotation pointListAnnotation;
+		[SerializeField] private ConnectionListAnnotation connectionListAnnotation;
+		[SerializeField] private Color leftLandmarkColor = Color.green;
+		[SerializeField] private Color rightLandmarkColor = Color.green;
+
+		public Hand handedness = Hand.None;
+		public Action<Hand, float> OnFingerDistanceChanged;
 
 		public override bool isMirrored
 		{
@@ -84,8 +87,8 @@ namespace Mediapipe.Unity
 
 		private void Start()
 		{
-			pointListAnnotation.Fill(LandmarkCount);
-			connectionListAnnotation.Fill(_connections, pointListAnnotation);
+			pointListAnnotation.Fill(HandLandmarkCollection.LandmarkCount);
+			connectionListAnnotation.Fill(HandLandmarkCollection.Connections, pointListAnnotation);
 			
 			pointListAnnotation.hand = this;
 		}
