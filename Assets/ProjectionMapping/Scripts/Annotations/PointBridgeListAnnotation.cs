@@ -9,6 +9,8 @@ namespace ProjectionMapping
     public sealed class PointBridgeListAnnotation : ListAnnotation<PointBridgeAnnotation>
     {
 	    public EntityManager EManager;
+	    public EntityArchetype EntityArchetype;
+	    
 	    private byte _counter;
 	    
 	    private void Start()
@@ -26,21 +28,29 @@ namespace ProjectionMapping
 	    
 	    public void SetHandedness(IReadOnlyList<Category> handedness)
 	    {
-		    if (handedness == null || handedness.Count == 0 || handedness[0].categoryName == "Left")
+		    foreach (var c in children)
 		    {
-			    
+			    if (handedness == null || handedness.Count == 0)
+			    {
+					c.hand = Hand.None;
+			    }
+			    else
+				    c.hand = handedness[0].categoryName switch
+				    {
+					    // dk why its always inverted
+					    "Right" => Hand.Left,
+					    "Left" => Hand.Right,
+					    _ => c.hand
+				    };
+			    // ignore unknown label
 		    }
-		    else if (handedness[0].categoryName == "Right")
-		    {
-			    
-		    }
-		    // ignore unknown label
 	    }
 
 	    protected override PointBridgeAnnotation InstantiateChild(bool active = true)
 	    {
 		    var c = base.InstantiateChild(active);
 		    c.EManager = EManager;
+		    c.EntityArchetype = EntityArchetype;
 		    c.id = _counter;
 		    if(_counter % 4 == 0) c.isTracked = true;
 		    _counter++;

@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
+using EugeneC.ECS;
 using Mediapipe.Tasks.Components.Containers;
 using Mediapipe.Unity;
 using Unity.Entities;
 using Unity.Mathematics;
+using Unity.Transforms;
 using UnityEngine;
 
 namespace ProjectionMapping
@@ -11,6 +13,7 @@ namespace ProjectionMapping
     public sealed class MultiPointBridgeListAnnotation : ListAnnotation<PointBridgeListAnnotation>
     {
 	    private EntityManager _entityManager;
+	    private EntityArchetype _entityArchetype;
 	    
 	    private async void Start()
 	    {
@@ -18,6 +21,9 @@ namespace ProjectionMapping
 		    {
 			    await Awaitable.EndOfFrameAsync();
 			    _entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+			    _entityArchetype = _entityManager.CreateArchetype(
+				    typeof(LocalTransform),
+				    typeof(HandPointIData));
 		    }
 		    catch (Exception e){ Debug.Log(e);}
 	    }
@@ -41,7 +47,7 @@ namespace ProjectionMapping
 
 		    for (var i = count; i < children.Count; i++)
 		    {
-			    children[i].SetHandedness((IReadOnlyList<Category>)null);
+			    children[i].SetHandedness(null);
 		    }
 	    }
 
@@ -49,6 +55,7 @@ namespace ProjectionMapping
 	    {
 		    var c = base.InstantiateChild(active);
 		    c.EManager = _entityManager;
+		    c.EntityArchetype = _entityArchetype;
 		    return c;
 	    }
     }
