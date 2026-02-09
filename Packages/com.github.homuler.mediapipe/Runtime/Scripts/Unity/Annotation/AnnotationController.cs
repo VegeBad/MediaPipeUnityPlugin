@@ -60,11 +60,11 @@ namespace Mediapipe.Unity
 			Logger.LogVerbose(GetType().Name, $"Adding RectTransform to {gameObject.name}");
 			var rectTransform = gameObject.AddComponent<RectTransform>();
 			// stretch width and height by default
-			rectTransform.pivot = new Vector2(0.5f, 0.5f);
-			rectTransform.anchorMin = Vector2.zero;
-			rectTransform.anchorMax = Vector2.one;
-			rectTransform.anchoredPosition3D = Vector3.zero;
-			rectTransform.sizeDelta = Vector2.zero;
+			rectTransform.pivot = new float2(0.5f, 0.5f);
+			rectTransform.anchorMin = float2.zero;
+			rectTransform.anchorMax = new float2(1f, 1f);
+			rectTransform.anchoredPosition3D = float3.zero;
+			rectTransform.sizeDelta = float2.zero;
 		}
 
 		protected virtual void LateUpdate()

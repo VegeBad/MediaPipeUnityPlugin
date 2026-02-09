@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Mediapipe.Tasks.Components.Containers;
 using Mediapipe.Unity;
 using Unity.Entities;
+using Unity.Mathematics;
 
 namespace ProjectionMapping
 {
@@ -21,6 +22,19 @@ namespace ProjectionMapping
 		    {
 			    CallActionForAll(target, (annotation, targets) => annotation?.Draw(targets));
 		    }
+	    }
+	    
+	    public void SetHandedness(IReadOnlyList<Category> handedness)
+	    {
+		    if (handedness == null || handedness.Count == 0 || handedness[0].categoryName == "Left")
+		    {
+			    
+		    }
+		    else if (handedness[0].categoryName == "Right")
+		    {
+			    
+		    }
+		    // ignore unknown label
 	    }
 
 	    protected override PointBridgeAnnotation InstantiateChild(bool active = true)

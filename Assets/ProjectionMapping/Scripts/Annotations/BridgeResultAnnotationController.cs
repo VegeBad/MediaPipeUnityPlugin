@@ -34,6 +34,7 @@ namespace ProjectionMapping
 		    lock (_currentTargetLock)
 		    {
 			    isStale = false;
+			    annotation.SetHandedness(_currentTarget.handedness);
 			    annotation.Draw(_currentTarget.handLandmarks);
 		    }
 	    }
