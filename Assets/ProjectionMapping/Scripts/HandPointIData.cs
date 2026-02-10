@@ -14,4 +14,6 @@ namespace ProjectionMapping
     {
 	    public float CurrentTime;
     }
+    
+    public struct HandGrabbableITag : IComponentData { }
 }

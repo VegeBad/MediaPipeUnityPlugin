@@ -1,6 +1,3 @@
-using EugeneC.Utilities;
-using Unity.Assertions;
-using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
@@ -10,13 +7,12 @@ using Unity.Physics.Systems;
 using Unity.Transforms;
 using static Unity.Physics.Math;
 using UnityEngine;
-using RaycastHit = Unity.Physics.RaycastHit;
 
 // Revised version of the MousePickAuthoring script from the Unity Physics Samples repository
 namespace EugeneC.ECS
 {
 	[DisallowMultipleComponent]
-	public sealed class MouseGrabAuthoring : MonoBehaviour
+	public sealed class ColliderCastAuthoring : MonoBehaviour
 	{
 		[SerializeField] private bool ignoreTriggers = true;
 		[SerializeField] private bool ignoreStatic = true;
@@ -32,13 +28,12 @@ namespace EugeneC.ECS
 				deleteTagEntityOnClick = false;
 		}
 
-		public class Baker : Baker<MouseGrabAuthoring>
+		public class Baker : Baker<ColliderCastAuthoring>
 		{
-			public override void Bake(MouseGrabAuthoring authoring)
+			public override void Bake(ColliderCastAuthoring authoring)
 			{
 				var e = GetEntity(TransformUsageFlags.None);
-				AddComponent(e, new MouseInputISingleton());
-				AddComponent(e, new MouseGrabISingleton
+				AddComponent(e, new ColliderCastISingleton
 				{
 					IgnoreStatic = authoring.ignoreStatic,
 					IgnoreTriggers = authoring.ignoreTriggers,
@@ -49,29 +44,14 @@ namespace EugeneC.ECS
 		}
 	}
 
-	public struct MouseInputISingleton : IComponentData
-	{
-		public float CurrentInput;
-		public float PreviousInput;
-		public float2 Position;
-	}
-
-	public struct MouseGrabISingleton : IComponentData
+	public struct ColliderCastISingleton : IComponentData
 	{
 		public bool IgnoreTriggers;
 		public bool IgnoreStatic;
 		public bool DeleteEntityOnClick;
 		public bool DeleteTagEntityOnClick;
 	}
-
-	public struct SpringData
-	{
-		public Entity Entity;
-		public bool Picked;
-		public float3 PointOnBody;
-		public float MouseDepth;
-	}
-
+	
 	[UpdateInGroup(typeof(Eu_PostTransformSystemGroup))]
 	public partial class MouseGrabInputSystemBase : SystemBase
 	{
@@ -89,7 +69,7 @@ namespace EugeneC.ECS
 
 		protected override void OnCreate()
 		{
-			RequireForUpdate<MouseGrabISingleton>();
+			RequireForUpdate<ColliderCastISingleton>();
 			RequireForUpdate<MouseInputISingleton>();
 			RequireForUpdate<PhysicsWorldSingleton>();
 		}
@@ -105,12 +85,12 @@ namespace EugeneC.ECS
 			{
 				case { CurrentInput: >= 0.5f, PreviousInput: < 0.5f }:
 				{
-					var grab = SystemAPI.GetSingleton<MouseGrabISingleton>();
+					var grab = SystemAPI.GetSingleton<ColliderCastISingleton>();
 					var physicsWorld = SystemAPI.GetSingleton<PhysicsWorldSingleton>().PhysicsWorld;
 
 					var camRay = cam.ScreenPointToRay(new Vector3(input.Position.x, input.Position.y, 0));
 
-					Dependency = new PickIJob
+					Dependency = new CastIJob
 					{
 						CollisionWorld = physicsWorld.CollisionWorld,
 						IgnoreStatic = grab.IgnoreStatic,
@@ -125,6 +105,7 @@ namespace EugeneC.ECS
 						},
 						Near = cam.nearClipPlane,
 						Forward = cam.transform.forward,
+						MaxDistance = MaxDistance
 					}.Schedule(Dependency);
 
 					PickJobHandle = Dependency;
@@ -141,108 +122,6 @@ namespace EugeneC.ECS
 		{
 			SpringDataRef.Dispose();
 		}
-
-#if !UNITY_WEBGL || UNITY_EDITOR
-		[BurstCompile]
-#endif
-		public struct MouseGrabICollector : ICollector<RaycastHit>
-		{
-			public MouseGrabICollector(int dynamicCount, float maxFraction = 1f)
-			{
-				Hit = default;
-				IgnoreTriggers = true;
-				IgnoreStatic = true;
-				_numDynamicBodies = dynamicCount;
-				MaxFraction = maxFraction;
-				NumHits = 0;
-			}
-
-			public RaycastHit Hit;
-			public bool IgnoreTriggers;
-			public bool IgnoreStatic;
-			private readonly int _numDynamicBodies;
-
-			// Below are all ICollector implementations
-			public bool EarlyOutOnFirstHit => false;
-			public float MaxFraction { get; private set; }
-			public int NumHits { get; private set; }
-
-			public bool AddHit(RaycastHit hit)
-			{
-				Assert.IsTrue(hit.Fraction <= MaxFraction);
-
-				var passed = true;
-				if (IgnoreStatic)
-					passed &= hit.RigidBodyIndex >= 0 && hit.RigidBodyIndex < _numDynamicBodies;
-				if (IgnoreTriggers)
-					passed &= hit.Material.CollisionResponse != CollisionResponsePolicy.RaiseTriggerEvents;
-				if (!passed) return false;
-
-				Hit = hit;
-				MaxFraction = hit.Fraction;
-				NumHits = 1;
-				return true;
-			}
-		}
-
-#if !UNITY_WEBGL || UNITY_EDITOR
-		[BurstCompile]
-#endif
-		public struct PickIJob : IJob
-		{
-			[ReadOnly] public CollisionWorld CollisionWorld;
-			[ReadOnly] public bool IgnoreTriggers;
-			[ReadOnly] public bool IgnoreStatic;
-
-			public NativeReference<SpringData> SpringDataRef;
-			public RaycastInput RayInput;
-			public float Near;
-			public float3 Forward;
-
-			public void Execute()
-			{
-				var pickCollector = new MouseGrabICollector(CollisionWorld.NumDynamicBodies)
-				{
-					IgnoreTriggers = IgnoreTriggers,
-					IgnoreStatic = IgnoreStatic
-				};
-
-				if (CollisionWorld.CastRay(RayInput, ref pickCollector))
-				{
-					var fraction = pickCollector.Hit.Fraction;
-					var hitBody = CollisionWorld.Bodies[pickCollector.Hit.RigidBodyIndex];
-
-					//Grab that specific point on the body instead of the center
-					float3 pointOnBody;
-					{
-						//Convert world transform to local transform
-						var localTrans = Inverse(new MTransform(hitBody.WorldFromBody));
-						pointOnBody = Mul(localTrans, pickCollector.Hit.Position);
-					}
-
-					float rayDot;
-					{
-						var rayDir = math.normalize(RayInput.End - RayInput.Start);
-						rayDot = math.dot(rayDir, Forward);
-					}
-
-					SpringDataRef.Value = new SpringData
-					{
-						Entity = hitBody.Entity,
-						Picked = true,
-						PointOnBody = pointOnBody,
-						MouseDepth = Near + rayDot * fraction * MaxDistance
-					};
-				}
-				else
-				{
-					SpringDataRef.Value = new SpringData
-					{
-						Picked = false
-					};
-				}
-			}
-		}
 	}
 
 	[UpdateInGroup(typeof(BeforePhysicsSystemGroup))]
@@ -253,7 +132,7 @@ namespace EugeneC.ECS
 		protected override void OnCreate()
 		{
 			_grabSystemBase = World.GetOrCreateSystemManaged<MouseGrabInputSystemBase>();
-			RequireForUpdate<MouseGrabISingleton>();
+			RequireForUpdate<ColliderCastISingleton>();
 			RequireForUpdate<MouseInputISingleton>();
 		}
 
@@ -266,7 +145,7 @@ namespace EugeneC.ECS
 			if (!data.Picked) return;
 			var entity = data.Entity;
 
-			var grab = SystemAPI.GetSingleton<MouseGrabISingleton>();
+			var grab = SystemAPI.GetSingleton<ColliderCastISingleton>();
 			if (grab.DeleteEntityOnClick)
 			{
 				EntityManager.DestroyEntity(entity);

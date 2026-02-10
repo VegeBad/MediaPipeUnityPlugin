@@ -1,6 +1,6 @@
-using System.Collections.Generic;
 using EugeneC.ECS;
 using Mediapipe.Unity;
+using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
@@ -31,6 +31,7 @@ namespace ProjectionMapping
 		public float RRing2Pinky;
 	}
 	
+	[BurstCompile]
 	[UpdateInGroup(typeof(Eu_EffectSystemGroup), OrderFirst = true)]
     public partial struct HandPointISystem : ISystem
     {
@@ -46,6 +47,7 @@ namespace ProjectionMapping
 		    state.RequireForUpdate<HandTrackingISingleton>();
 	    }
 
+	    [BurstCompile]
 	    public void OnUpdate(ref SystemState state)
 	    {
 		    var tracking = SystemAPI.GetSingleton<HandTrackingISingleton>();

@@ -4,10 +4,7 @@
 // license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
-using System;
 using System.Collections.Generic;
-using JetBrains.Annotations;
-using ProjectionMapping;
 using Unity.Mathematics;
 using UnityEngine;
 using mplt = Mediapipe.LocationData.Types;
@@ -25,11 +22,6 @@ namespace Mediapipe.Unity
 		[SerializeField] private Color color = Color.green;
 		[SerializeField] private float radius = 15.0f;
 		public HandLandmarkListAnnotation hand;
-		
-		private byte _pointCount = 0;
-		private PointAnnotation _trackedThumb;
-		private PointAnnotation _trackedIndex;
-		private MonoPinchCast _pinch;
 
 #if UNITY_EDITOR
 		private void OnValidate()
@@ -39,16 +31,6 @@ namespace Mediapipe.Unity
 			ApplyRadius(radius);
 		}
 #endif
-		// Ignore Y level (Although didn't change much)
-		private void Update()
-		{
-			if(_trackedIndex is null || _trackedThumb is null || hand is null) return;
-			var a = new float2(_trackedThumb.transform.position.x, _trackedThumb.transform.position.z);
-			var b = new float2(_trackedIndex.transform.position.x, _trackedIndex.transform.position.z);
-			var dis = math.distance(a, b);
-			hand.OnFingerDistanceChanged?.Invoke(hand.handedness, dis);
-		}
-
 		public void SetColor(Color col)
 		{
 			color = col;
@@ -126,20 +108,6 @@ namespace Mediapipe.Unity
 			var annotation = base.InstantiateChild(isActive);
 			annotation.SetColor(color);
 			annotation.SetRadius(radius);
-			
-			_pointCount++;
-			// Get [4] and [8] points
-			switch (_pointCount)
-			{
-				case 5:
-					_trackedThumb = annotation;
-					_pinch = annotation.gameObject.AddComponent<MonoPinchCast>();
-					_pinch.pointList = this;
-					break;
-				case 9:
-					_trackedIndex = annotation;
-					break;
-			}
 			return annotation;
 		}
 
