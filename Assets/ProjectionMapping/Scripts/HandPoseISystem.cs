@@ -12,19 +12,13 @@ namespace ProjectionMapping
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
-        
+			state.RequireForUpdate<HandTrackingISingleton>();
         }
 
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-        
-        }
-
-        [BurstCompile]
-        public void OnDestroy(ref SystemState state)
-        {
-        
+	        var tracking = SystemAPI.GetSingleton<HandTrackingISingleton>();
         }
     }
 }

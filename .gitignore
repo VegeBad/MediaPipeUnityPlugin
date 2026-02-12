@@ -28,7 +28,7 @@ bazel-*
 
 Assets/StreamingAssets*
 Assets/Chess/*
-Assets/Chess/*.meta
+!Assets/Chess/*.meta
 
 # Packages/com.github.homuler.mediapipe/PackageResources/MediaPipe/*
 # !Packages/com.github.homuler.mediapipe/PackageResources/MediaPipe/*.meta
