@@ -15,6 +15,12 @@ namespace ProjectionMapping
     {
 	    public bool UseGrabAny;
     }
+
+    public struct HandPoseISingleton : IComponentData
+    {
+	    public EHandPose LeftHandPose;
+	    public EHandPose RightHandPose;
+    }
     
     public struct PointSpawnIData : IComponentData
     {

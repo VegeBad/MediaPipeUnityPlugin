@@ -90,7 +90,7 @@ namespace ProjectionMapping
 
 				if (!_textureFramePool.TryGetTextureFrame(out var textureFrame))
 				{
-					yield return new WaitForEndOfFrame();
+					yield return waitForEndOfFrame;
 					continue;
 				}
 

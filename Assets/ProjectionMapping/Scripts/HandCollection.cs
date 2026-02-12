@@ -15,6 +15,7 @@ namespace ProjectionMapping
 		LIndex2Middle,
 		LMiddle2Ring,
 		LRing2Pinky,
+		LPinky2Thumb,
 		RWrist2Thumb,
 		RWrist2Index,
 		RWrist2Middle,
@@ -24,6 +25,7 @@ namespace ProjectionMapping
 		RIndex2Middle,
 		RMiddle2Ring,
 		RRing2Pinky,
+		RPinky2Thumb,
 	}
 	
 	public enum EHandPose : byte
@@ -37,6 +39,14 @@ namespace ProjectionMapping
 		RockNRoll = 1 << 5,
 		OkSign = 1 << 6,
 		HighFive = 1 << 7,
+	}
+
+	[System.Flags]
+	public enum ECurlDegree : byte
+	{
+		Full = 0,
+		Half = 1 << 0,
+		None = 1 << 1,
 	}
 	
     public static class HandCollection
@@ -54,6 +64,7 @@ namespace ProjectionMapping
 			    ETrackingTarget.LIndex2Middle => (singleton.LeftHand.Index2Middle.Current, singleton.LeftHand.Index2Middle.Position),
 			    ETrackingTarget.LMiddle2Ring => (singleton.LeftHand.Middle2Ring.Current, singleton.LeftHand.Middle2Ring.Position),
 			    ETrackingTarget.LRing2Pinky => (singleton.LeftHand.Ring2Pinky.Current, singleton.LeftHand.Ring2Pinky.Position),
+			    ETrackingTarget.LPinky2Thumb => (singleton.LeftHand.Pinky2Thumb.Current, singleton.LeftHand.Pinky2Thumb.Position),
 			    ETrackingTarget.RWrist2Thumb => (singleton.RightHand.Wrist2Thumb.Current, singleton.RightHand.Wrist2Thumb.Position),
 			    ETrackingTarget.RWrist2Index => (singleton.RightHand.Wrist2Index.Current, singleton.RightHand.Wrist2Index.Position),
 			    ETrackingTarget.RWrist2Middle => (singleton.RightHand.Wrist2Middle.Current, singleton.RightHand.Wrist2Middle.Position),
@@ -63,6 +74,7 @@ namespace ProjectionMapping
 			    ETrackingTarget.RIndex2Middle => (singleton.RightHand.Index2Middle.Current, singleton.RightHand.Index2Middle.Position),
 			    ETrackingTarget.RMiddle2Ring => (singleton.RightHand.Middle2Ring.Current, singleton.RightHand.Middle2Ring.Position),
 			    ETrackingTarget.RRing2Pinky => (singleton.RightHand.Ring2Pinky.Current, singleton.RightHand.Ring2Pinky.Position),
+			    ETrackingTarget.RPinky2Thumb => (singleton.RightHand.Pinky2Thumb.Current, singleton.RightHand.Pinky2Thumb.Position),
 			    _ => (-1f, float3.zero)
 		    };
 	    }
@@ -80,6 +92,7 @@ namespace ProjectionMapping
 			    ETrackingTarget.LIndex2Middle => singleton.LeftHand.Index2Middle.Previous,
 			    ETrackingTarget.LMiddle2Ring => singleton.LeftHand.Middle2Ring.Previous,
 			    ETrackingTarget.LRing2Pinky => singleton.LeftHand.Ring2Pinky.Previous,
+			    ETrackingTarget.LPinky2Thumb => singleton.LeftHand.Pinky2Thumb.Previous,
 			    ETrackingTarget.RWrist2Thumb => singleton.RightHand.Wrist2Thumb.Previous,
 			    ETrackingTarget.RWrist2Index => singleton.RightHand.Wrist2Index.Previous,
 			    ETrackingTarget.RWrist2Middle => singleton.RightHand.Wrist2Middle.Previous,
@@ -89,6 +102,7 @@ namespace ProjectionMapping
 			    ETrackingTarget.RIndex2Middle => singleton.RightHand.Index2Middle.Previous,
 			    ETrackingTarget.RMiddle2Ring => singleton.RightHand.Middle2Ring.Previous,
 			    ETrackingTarget.RRing2Pinky => singleton.RightHand.Ring2Pinky.Previous,
+			    ETrackingTarget.RPinky2Thumb => singleton.RightHand.Pinky2Thumb.Previous,
 			    _ => -1f
 		    };
 	    }
@@ -103,10 +117,26 @@ namespace ProjectionMapping
 		    };
 	    }
 
-	    private static EHandPose GetPose(HandData data)
+	    public static EHandPose GetPose(this HandData data)
 	    {
+		    if (data.Pinky2Thumb.Current <= -1 || data.Wrist2Index.Current <= -1) return EHandPose.None;
 		    
-		    return EHandPose.None;
+		    var thumb = IsFingerCurled(data.Pinky2Thumb);
+		    var index = IsFingerCurled(data.Wrist2Index);
+		    var middle = IsFingerCurled(data.Wrist2Middle);
+		    var ring = IsFingerCurled(data.Wrist2Ring);
+		    var pinky = IsFingerCurled(data.Wrist2Pinky);
+		    var pinch = IsFingerCurled(data.Thumb2Index, 1f);
+
+		    return thumb switch
+		    {
+			    false when !index && !middle && !ring && !pinky => EHandPose.HighFive,
+			    true when index && middle && ring && pinky => EHandPose.ClenchedFist,
+			    true when index && !middle && ring && pinky => EHandPose.MiddleFinger,
+			    _ => EHandPose.None
+		    };
+
+		    bool IsFingerCurled(PointData point, float threshold = 2f) => point.Current < threshold;
 	    }
     }
 }

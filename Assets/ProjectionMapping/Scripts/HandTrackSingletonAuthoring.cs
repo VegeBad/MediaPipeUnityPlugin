@@ -19,6 +19,7 @@ namespace ProjectionMapping
 		    {
 			    var e = GetEntity(TransformUsageFlags.None);
 			    AddComponent<HandTrackingISingleton>(e);
+			    AddComponent<HandPoseISingleton>(e);
 			    AddComponent(e, new HandSettingISingleton
 			    {
 				    UseGrabAny = authoring.useGrabAny

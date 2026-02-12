@@ -26,9 +26,9 @@ namespace ProjectionMapping
 		public PointData Index2Middle;
 		public PointData Middle2Ring;
 		public PointData Ring2Pinky;
+		public PointData Pinky2Thumb;
 	}
 	
-	// Maybe there's a better way to do this, but keep it as it is for now
 	public struct HandTrackingISingleton : IComponentData
 	{
 		public HandData LeftHand;
@@ -49,12 +49,14 @@ namespace ProjectionMapping
 	    public void OnCreate(ref SystemState state)
 	    {
 		    state.RequireForUpdate<HandTrackingISingleton>();
+		    state.RequireForUpdate<HandPoseISingleton>();
 	    }
 
 	    [BurstCompile]
 	    public void OnUpdate(ref SystemState state)
 	    {
 		    var tracking = SystemAPI.GetSingleton<HandTrackingISingleton>();
+		    var pose = SystemAPI.GetSingleton<HandPoseISingleton>();
 		    
 		    var leftPos = new NativeArray<float3>(21, Allocator.Temp);
 		    var rightPos = new NativeArray<float3>(21, Allocator.Temp);
@@ -84,6 +86,7 @@ namespace ProjectionMapping
 			    }
 		    }
 		    
+		    // Maybe there's a better way to do this, but keep it as it is for now
 		    tracking.LeftHand.Wrist2Thumb.Previous = tracking.LeftHand.Wrist2Thumb.Current;
 		    tracking.LeftHand.Wrist2Index.Previous = tracking.LeftHand.Wrist2Index.Current;
 		    tracking.LeftHand.Wrist2Middle.Previous = tracking.LeftHand.Wrist2Middle.Current;
@@ -94,6 +97,7 @@ namespace ProjectionMapping
 		    tracking.LeftHand.Index2Middle.Previous = tracking.LeftHand.Index2Middle.Current;
 		    tracking.LeftHand.Middle2Ring.Previous = tracking.LeftHand.Middle2Ring.Current;
 		    tracking.LeftHand.Ring2Pinky.Previous = tracking.LeftHand.Ring2Pinky.Current;
+		    tracking.LeftHand.Pinky2Thumb.Previous = tracking.LeftHand.Pinky2Thumb.Current;
 		    
 		    tracking.RightHand.Wrist2Thumb.Previous = tracking.RightHand.Wrist2Thumb.Current;
 		    tracking.RightHand.Wrist2Index.Previous = tracking.RightHand.Wrist2Index.Current;
@@ -105,6 +109,7 @@ namespace ProjectionMapping
 		    tracking.RightHand.Index2Middle.Previous = tracking.RightHand.Index2Middle.Current;
 		    tracking.RightHand.Middle2Ring.Previous = tracking.RightHand.Middle2Ring.Current;
 		    tracking.RightHand.Ring2Pinky.Previous = tracking.RightHand.Ring2Pinky.Current;
+		    tracking.RightHand.Pinky2Thumb.Previous = tracking.RightHand.Pinky2Thumb.Current;
 		    
 		    (tracking.LeftHand.Wrist2Thumb.Current, tracking.LeftHand.Wrist2Thumb.Position) 
 			    = DistanceBetween(leftPos, leftId, Wrist, Thumb);
@@ -125,6 +130,8 @@ namespace ProjectionMapping
 			    = DistanceBetween(leftPos, leftId, Middle, Ring);
 		    (tracking.LeftHand.Ring2Pinky.Current, tracking.LeftHand.Ring2Pinky.Position) 
 			    = DistanceBetween(leftPos, leftId, Ring, Pinky);
+		    (tracking.LeftHand.Pinky2Thumb.Current, tracking.LeftHand.Pinky2Thumb.Position) 
+			    = DistanceBetween(leftPos, leftId, Pinky, Thumb);
 		    
 		    (tracking.RightHand.Wrist2Thumb.Current, tracking.RightHand.Wrist2Thumb.Position) 
 			    = DistanceBetween(rightPos, rightId, Wrist, Thumb);
@@ -145,6 +152,8 @@ namespace ProjectionMapping
 			    = DistanceBetween(rightPos, rightId, Middle, Ring);
 		    (tracking.RightHand.Ring2Pinky.Current, tracking.RightHand.Ring2Pinky.Position) 
 			    = DistanceBetween(rightPos, rightId, Ring, Pinky);
+		    (tracking.RightHand.Pinky2Thumb.Current, tracking.RightHand.Pinky2Thumb.Position) 
+			    = DistanceBetween(rightPos, rightId, Pinky, Thumb);
 		    
 		    SystemAPI.SetSingleton(tracking);
 
@@ -152,6 +161,12 @@ namespace ProjectionMapping
 		    rightPos.Dispose();
 		    leftId.Dispose();
 		    rightId.Dispose();
+
+		    var (lValid, left) = tracking.GetHand(EHand.Left);
+		    pose.LeftHandPose = lValid ? left.GetPose() : EHandPose.None;
+		    var (rValid, right) = tracking.GetHand(EHand.Right);
+		    pose.RightHandPose = rValid ? right.GetPose() : EHandPose.None;
+		    SystemAPI.SetSingleton(pose);
 	    }
 
 	    private (float, float3) DistanceBetween(NativeArray<float3> pos, NativeArray<byte> id, int id1, int id2)
