@@ -1,4 +1,6 @@
+using System;
 using EugeneC.ECS;
+using Google.Protobuf.WellKnownTypes;
 using Mediapipe.Unity;
 using Unity.Burst;
 using Unity.Collections;
@@ -85,8 +87,12 @@ namespace ProjectionMapping
 					    break;
 			    }
 		    }
-		    
+
 		    // Maybe there's a better way to do this, but keep it as it is for now
+		    // If I decided to use Enum.GetValues(),
+		    // cuz that is a managed type, I had to give up burst compile.
+		    // TODO: Need testing to find which is better
+		    
 		    tracking.LeftHand.Wrist2Thumb.Previous = tracking.LeftHand.Wrist2Thumb.Current;
 		    tracking.LeftHand.Wrist2Index.Previous = tracking.LeftHand.Wrist2Index.Current;
 		    tracking.LeftHand.Wrist2Middle.Previous = tracking.LeftHand.Wrist2Middle.Current;

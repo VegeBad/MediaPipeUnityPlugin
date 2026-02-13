@@ -40,14 +40,6 @@ namespace ProjectionMapping
 		OkSign = 1 << 6,
 		HighFive = 1 << 7,
 	}
-
-	[System.Flags]
-	public enum ECurlDegree : byte
-	{
-		Full = 0,
-		Half = 1 << 0,
-		None = 1 << 1,
-	}
 	
     public static class HandCollection
     {
@@ -121,22 +113,27 @@ namespace ProjectionMapping
 	    {
 		    if (data.Pinky2Thumb.Current <= -1 || data.Wrist2Index.Current <= -1) return EHandPose.None;
 		    
-		    var thumb = IsFingerCurled(data.Pinky2Thumb);
+		    var thumb = IsFingerCurled(data.Pinky2Thumb, 1.5f);
 		    var index = IsFingerCurled(data.Wrist2Index);
 		    var middle = IsFingerCurled(data.Wrist2Middle);
 		    var ring = IsFingerCurled(data.Wrist2Ring);
 		    var pinky = IsFingerCurled(data.Wrist2Pinky);
-		    var pinch = IsFingerCurled(data.Thumb2Index, 1f);
+		    var pinch = IsFingerCurled(data.Thumb2Index, 1.1f);
 
 		    return thumb switch
 		    {
-			    false when !index && !middle && !ring && !pinky => EHandPose.HighFive,
-			    true when index && middle && ring && pinky => EHandPose.ClenchedFist,
-			    true when index && !middle && ring && pinky => EHandPose.MiddleFinger,
+			    false when !index && !middle && !ring && !pinky && !pinch => EHandPose.HighFive,
+			    false when !index && !middle && !ring && !pinky && pinch => EHandPose.OkSign,
+			    true when index && middle && ring && pinky && pinch => EHandPose.ClenchedFist,
+			    false when index && middle && ring && pinky && !pinch => EHandPose.ThumbsUp,
+			    false when index && middle && ring && !pinky && !pinch => EHandPose.PhoneSign,
+			    false when !index && middle && ring && !pinky && !pinch => EHandPose.RockNRoll,
+			    true when index && !middle && ring && pinky && pinch => EHandPose.MiddleFinger,
+			    true when !index && !middle && ring && pinky && !pinch => EHandPose.PeaceSign,
 			    _ => EHandPose.None
 		    };
 
-		    bool IsFingerCurled(PointData point, float threshold = 2f) => point.Current < threshold;
+		    bool IsFingerCurled(PointData point, float threshold = 1.8f) => point.Current < threshold;
 	    }
     }
 }
